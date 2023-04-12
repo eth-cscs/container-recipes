@@ -38,7 +38,7 @@ RUN spack external find --all --not-buildable
 RUN spack compiler find
 
 # explicitly ask for nvhpc installation
-RUN spack install libxc%nvhpc
+RUN spack install libxc@5.2.3 %nvhpc
 
 RUN spack install --only=dependencies mpich@${MPICH_VERSION} %nvhpc
 RUN spack install mpich@${MPICH_VERSION} %nvhpc
