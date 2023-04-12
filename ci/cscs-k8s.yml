@@ -36,8 +36,9 @@ run qe71 image:
   needs: ["build qe71 image"]
   tags: ['hohgant-login-baremetal']
   script:
-    - pip install reframe
-    - srun sarus ls
+    - python3 -m venv venv_reframe
+    - venv_reframe/bin/pip install ReFrame-HPC
+    - venv_reframe/bin/reframe
 
 
     #build cuda image:
