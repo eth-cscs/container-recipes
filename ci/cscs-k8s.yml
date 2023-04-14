@@ -43,6 +43,7 @@ run qe71 image:
     - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
+    - pip install reframe-hpc
     - export RFM_AUTODETECT_XTHOSTNAME=1
     - export RFM_REMOTE_DETECT=0
     - sed -i "s/\(.*'modules_system'.*\)'lmod'/\1'nomod'/" cscs-reframe-tests/config/systems/hohgant.py
