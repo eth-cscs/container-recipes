@@ -35,6 +35,8 @@ run qe71 image:
   stage: run
   needs: ["build qe71 image"]
   tags: ['hohgant-login-baremetal']
+  variables:
+    GIT_STRATEGY: fetch
   script:
     - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
     - rm -rf cscs-reframe-tests
@@ -42,6 +44,7 @@ run qe71 image:
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
     - export RFM_AUTODETECT_XTHOSTNAME=1
+    - export RFM_REMOTE_DETECT=0
     - sed -i "s/\(.*'modules_system'.*\)'lmod'/\1'nomod'/" cscs-reframe-tests/config/systems/hohgant.py
     - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py -r --prefix=$SCRATCH --skip-performance-check
     - deactivate
@@ -56,5 +59,3 @@ run qe71 image:
     #    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/sirius/sirius-ci:$CI_COMMIT_SHA
     #    SPEC: 'sirius@develop %gcc build_type=RelWithDebInfo +tests +apps +cuda +scalapack ^mpich ^intel-oneapi-mkl+cluster'
     #    DOCKER_BUILD_ARGS: '["BASE_IMAGE=${BASE_IMAGE}", "SPECDEV=$SPEC"]'
-
-
