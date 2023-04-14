@@ -1,0 +1,103 @@
+# Copyright 2016-2022 Swiss National Supercomputing Centre (CSCS/ETH Zurich)
+# ReFrame Project Developers. See the top-level LICENSE file for details.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+import reframe as rfm
+import reframe.utility.sanity as sn
+
+
+class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
+    valid_systems = ['hohgant:cpu', 'eiger:mc', 'pilatus:mc']
+    valid_prog_environs = ['builtin']
+    container_platform = 'Sarus'
+    scale = parameter(['small'])
+    qe_image = variable(str, value='NULL')
+    variant = parameter(['prod'])
+    executable = 'pw.x'
+    executable_opts = ['-in', 'ausurf.in', '-pd', '.true.']
+    extra_resources = {
+        'switches': {
+            'num_switches': 1
+        }
+    }
+    strict_check = False
+    maintainers = ['LM']
+    tags = {'scs'}
+
+    @run_after('init')
+    def skip_if_null_image(self):
+        self.skip_if(self.qe_image == 'NULL', 'no QE container image was given')
+
+    @sanity_function
+    def assert_simulation_success(self):
+        energy = sn.extractsingle(r'!\s+total energy\s+=\s+(?P<energy>\S+) Ry',
+                                  self.stdout, 'energy', float)
+        energy_diff = sn.abs(energy-self.energy_reference)
+        return sn.all([
+            sn.assert_found(r'convergence has been achieved', self.stdout),
+            sn.assert_lt(energy_diff, self.energy_tolerance)
+        ])
+
+    @performance_function('s')
+    def time(self):
+        return sn.extractsingle(r'electrons.+\s(?P<wtime>\S+)s WALL',
+                                self.stdout, 'wtime', float)
+
+@rfm.simple_test
+class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
+    energy_tolerance = 1.0e-6
+
+    @run_after('init')
+    def setup_test(self):
+        self.descr = (f'QuantumESPRESSO CPU check (version: {self.scale}, '
+                      f'{self.variant})')
+        self.env_vars = {
+            'MPICH_OFI_STARTUP_CONNECT': 1,
+            'OMP_NUM_THREADS': 8,
+            'OMP_PLACES': 'cores',
+            'OMP_PROC_BIND': 'close'
+        }
+
+        if self.scale == 'small':
+            self.energy_reference = -11427.09017218
+            self.num_tasks = 48 
+            self.num_tasks_per_node = 16
+            self.num_cpus_per_task = 16
+            self.num_tasks_per_core = 1
+        else:
+            self.energy_reference = -11427.09017152
+            self.num_tasks = 256
+            self.num_tasks_per_node = 16
+            self.num_cpus_per_task = 16
+            self.num_tasks_per_core = 1
+
+    @run_after('setup')
+    def setup_container_platform(self):
+        self.container_platform.image = self.qe_image
+        self.container_platform.with_mpi = True 
+        command = f'/qe-cpu/{self.executable} {" ".join(self.executable_opts)}'
+        self.container_platform.pull_image = False
+        self.container_platform.command = command 
+
+    @run_before('performance')
+    def set_reference(self):
+        references = {
+            'small': {
+                '*': {'time': (55.51, None, 0.10, 's')}
+            },
+            'large': {
+                '*': {'time': (43.211, None, 0.10, 's')}
+            }
+        }
+        self.reference = references[self.scale]
+
+    @run_before('run')
+    def set_task_distribution(self):
+        self.job.options = ['--distribution=block:block']
+
+    @run_before('run')
+    def set_cpu_binding(self):
+        self.job.launcher.options = ['--cpu-bind=cores']
+        if self.current_system.name in {'hohgant'}:
+            self.job.launcher.options += ['--mpi=pmi2']

@@ -36,9 +36,13 @@ run qe71 image:
   needs: ["build qe71 image"]
   tags: ['hohgant-login-baremetal']
   script:
+    - echo -e '$CUSTOM_ENV_CSCS_REGISTRY_USER\n$CUSTOM_ENV_CSCS_REGISTRY_PASSWORD' | sarus pull --login $BASE_IMAGE
+    - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
     - python3 -m venv venv_reframe
-    - venv_reframe/bin/pip install ReFrame-HPC
-    - venv_reframe/bin/reframe
+    - source venv_reframe/bin/activate
+    - export RFM_AUTODETECT_XTHOSTNAME=1
+    - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py -r --prefix=$SCRATCH --skip-performance-check
+    - deactivate
 
 
     #build cuda image:
