@@ -41,6 +41,7 @@ run qe71 image:
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
     - export RFM_AUTODETECT_XTHOSTNAME=1
+    - sed -i "s/\(.*'modules_system': \)'lmod'/\1'nomod'/" ~/cscs-reframe-tests/config/systems/hohgant.py
     - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py -r --prefix=$SCRATCH --skip-performance-check
     - deactivate
 
