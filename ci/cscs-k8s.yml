@@ -19,7 +19,7 @@ stages:
   # the following jobs via a dotenv file.
   before_script:
   - DOCKER_TAG=`sha256sum QuantumESPRESSO/7.1-nvhpc-mkl/Dockerfile | head -c 16`
-  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/qe-7.1-$DOCKER_TAG
+  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/qe-$QE_VERSION-$DOCKER_TAG
   - echo "BASE_IMAGE=$PERSIST_IMAGE_NAME" >> build.env
   artifacts:
     reports:
@@ -32,7 +32,14 @@ stages:
 build qe71 image:
   extends: .build-qe-image
   variables:
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=7.1"]'
+    QE_VERSION: '7.1'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
+
+build qe72 image:
+  extends: .build-qe-image
+  variables:
+    QE_VERSION: '7.2'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
 
 run qe71 image:
   extends: .container-runner-hohgant
