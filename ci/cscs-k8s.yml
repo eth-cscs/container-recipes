@@ -46,9 +46,14 @@ run qe71 image:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_XTHOSTNAME=1
     - export RFM_REMOTE_DETECT=0
-    - sed -i "s/\(.*'modules_system'.*\)'lmod'/\1'nomod'/" cscs-reframe-tests/config/systems/hohgant.py
-    - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py -r --prefix=$SCRATCH --skip-performance-check
+    - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --prefix=$SCRATCH --skip-performance-check --report-junit=report.xml -r
     - deactivate
+  artifacts:
+    when: always
+    paths:
+      - report.xml
+    reports:
+      junit: report.xml
 
 
     #build cuda image:
