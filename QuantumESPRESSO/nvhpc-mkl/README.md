@@ -1,4 +1,4 @@
-Quantum ESPRESSO 7.1 compiled with nvhpc toolkit for cpu and gpu
+Quantum ESPRESSO compiled with nvhpc toolkit for cpu and GPU
 
 CPU version:
  - libxc
