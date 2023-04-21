@@ -1,15 +1,3 @@
-#include:
-#  - remote: 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
-
-#include:
-#  - remote: 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
-#
-#stages:
-#  - build
-#  - run
-#    #  - build
-#    #  - test
-#
 .build-qe-image:
   extends: .container-builder
   stage: build
@@ -21,7 +9,8 @@
   # Since the base image name is runtime dependent, we need to carry the value of it to
   # the following jobs via a dotenv file.
   before_script:
-  - DOCKER_TAG=`sha256sum QuantumESPRESSO/nvhpc-mkl/Dockerfile | head -c 16`
+#  - DOCKER_TAG=`sha256sum QuantumESPRESSO/nvhpc-mkl/Dockerfile | head -c 16`
+  - DOCKER_TAG=`sha256sum ${DOCKERFILE} | head -c 16`
   - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/qe-$QE_VERSION-$DOCKER_TAG
   - echo "BASE_IMAGE=$PERSIST_IMAGE_NAME" >> build.env
   artifacts:
@@ -69,13 +58,3 @@ run qe71 image:
     reports:
       junit: report.xml
 
-
-    #build cuda image:
-    #  extends: .container-builder
-    #  needs: ["build base cuda image"]
-    #  stage: build
-    #  variables:
-    #    DOCKERFILE: ci/build.Dockerfile
-    #    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/sirius/sirius-ci:$CI_COMMIT_SHA
-    #    SPEC: 'sirius@develop %gcc build_type=RelWithDebInfo +tests +apps +cuda +scalapack ^mpich ^intel-oneapi-mkl+cluster'
-    #    DOCKER_BUILD_ARGS: '["BASE_IMAGE=${BASE_IMAGE}", "SPECDEV=$SPEC"]'
