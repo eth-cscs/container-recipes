@@ -1,7 +1,5 @@
 FROM nvcr.io/nvidia/nvhpc:22.11-devel-cuda_multi-ubuntu22.04 as builder
 
-ARG QE_VERSION=7.1
-
 ENV DEBIAN_FRONTEND noninteractive
 
 ENV FORCE_UNSAFE_CONFIGURE 1
@@ -51,16 +49,18 @@ RUN spack spec $SPEC
 
 RUN spack install --only=dependencies $SPEC
 
-RUN wget https://gitlab.com/QEF/q-e/-/archive/qe-${QE_VERSION}/q-e-qe-${QE_VERSION}.tar.gz && \
-    tar zxvf q-e-qe-${QE_VERSION}.tar.gz
+ARG QE_VERSION=7.1
+
+RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.tar.gz && \
+    tar zxvf q-e-${QE_VERSION}.tar.gz
 
 # build CPU
-RUN cd /q-e-qe-${QE_VERSION} && mkdir build-cpu && cd build-cpu &&\
+RUN cd /q-e-${QE_VERSION} && mkdir build-cpu && cd build-cpu &&\
     spack build-env $SPEC -- cmake .. -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON -DQE_ENABLE_OPENMP=1 -DQE_ENABLE_SCALAPACK=1 -DQE_ENABLE_LIBXC=1 -DCMAKE_INSTALL_PREFIX=/opt/local/qe-cpu &&\
     spack build-env $SPEC -- make -j install
 
 # build GPU
-RUN cd /q-e-qe-${QE_VERSION} && mkdir build-gpu && cd build-gpu &&\
+RUN cd /q-e-${QE_VERSION} && mkdir build-gpu && cd build-gpu &&\
     spack build-env $SPEC -- cmake .. -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON -DQE_ENABLE_OPENMP=1 -DQE_ENABLE_SCALAPACK=0 -DQE_ENABLE_LIBXC=1 -DQE_ENABLE_CUDA=1 -DCMAKE_INSTALL_PREFIX=/opt/local/qe-gpu &&\
     spack build-env $SPEC -- make -j install
 

@@ -1,41 +1,29 @@
-build qe71 image:
+build qe-71 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
-    QE_VERSION: '7.1'
-    TAG: 'qe-${QE_VERSION}'
+    QE_VERSION: 'qe-7.1'
+    NAME_TAG: 'qe71'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
 
-build qe72 image:
+build qe-72 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
-    QE_VERSION: '7.2'
-    TAG: 'qe-${QE_VERSION}'
+    QE_VERSION: 'qe-7.2'
+    NAME_TAG: 'qe72'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
 
-run qe71 image hohgant:
-  extends: .container-runner-hohgant
-  stage: run
+build qe-develop image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
+    QE_VERSION: 'develop'
+    NAME_TAG: 'qe-dev'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
+
+test qe71 image hohgant:
+  extends: .run-reframe-test
   needs: ["build qe71 image"]
-  tags: ['hohgant-login-baremetal']
   variables:
-    GIT_STRATEGY: fetch
-  script:
-    - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
-    - rm -rf cscs-reframe-tests
-    - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
-    - python3 -m venv venv_reframe
-    - source venv_reframe/bin/activate
-    - pip install reframe-hpc
-    - export RFM_AUTODETECT_XTHOSTNAME=1
-    - export RFM_REMOTE_DETECT=0
-    - reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --prefix=$SCRATCH --skip-performance-check --report-junit=report.xml -r
-    - deactivate
-  artifacts:
-    when: always
-    paths:
-      - report.xml
-    reports:
-      junit: report.xml
-
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --prefix=$SCRATCH --skip-performance-check --report-junit=report.xml -r'
