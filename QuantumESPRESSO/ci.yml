@@ -1,4 +1,4 @@
-build qe-71 image:
+build qe71 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
@@ -6,7 +6,7 @@ build qe-71 image:
     NAME_TAG: 'qe71'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
 
-build qe-72 image:
+build qe72 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
