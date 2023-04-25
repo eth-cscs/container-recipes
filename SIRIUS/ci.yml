@@ -1,0 +1,7 @@
+build sirius-develop image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: SIRIUS/gcc-mkl/Dockerfile
+    NAME_TAG: 'sirius-develop'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60"]'
+
