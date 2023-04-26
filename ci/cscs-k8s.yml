@@ -51,6 +51,7 @@ include:
     when: always
     paths:
       - report.xml
+      - output/
     reports:
       junit: report.xml
 
