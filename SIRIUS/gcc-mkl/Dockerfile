@@ -56,5 +56,5 @@ RUN spack -e sirius-gpu-env install
 RUN spack env create --with-view /opt/sirius-cpu sirius-cpu-env
 ENV SPEC_CPU="sirius@develop%gcc build_type=Release +fortran +elpa +tests +scalapack ^mpich@${MPICH_VERSION} ^intel-oneapi-mkl+cluster ^spla ^spfft ^elpa"
 RUN spack -e sirius-cpu-env add $SPEC_CPU
-RUN spack -e sirius-cpu-env --fresh concretize
-RUN spack -e sirius-cpu-env --fresh install
+RUN spack -e sirius-cpu-env concretize --fresh
+RUN spack -e sirius-cpu-env install --fresh
