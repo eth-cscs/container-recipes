@@ -26,11 +26,11 @@ test qe71 image hohgant:
   extends: .run-reframe-test
   needs: ["build qe71 image"]
   variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --prefix=$SCRATCH --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
 test qe71 image hohgant hwmaint:
   extends: .run-reframe-test
   needs: ["build qe71 image"]
   variables:
     SLURM_JOB_NODELIST: nid002536
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --prefix=$SCRATCH --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'

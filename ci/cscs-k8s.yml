@@ -51,6 +51,8 @@ include:
     when: always
     paths:
       - report.xml
+      - stage/**/*.out
+      - stage/**/*.err
     reports:
       junit: report.xml
 
