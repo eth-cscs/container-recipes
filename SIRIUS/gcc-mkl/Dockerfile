@@ -47,20 +47,14 @@ RUN spack install mpich@${MPICH_VERSION} %gcc
 RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
 RUN ldconfig
 
-ENV SPEC_GPU="sirius@develop%gcc build_type=Release +fortran +elpa +tests +scalapack +cuda ^mpich@${MPICH_VERSION} ^intel-oneapi-mkl+cluster ^spla ^spfft+cuda ^elpa+cuda"
-
-# install all dependencies
-RUN spack install --only=dependencies $SPEC_GPU
-
 RUN spack env create --with-view /opt/sirius-gpu sirius-gpu-env
+ENV SPEC_GPU="sirius@develop%gcc build_type=Release +fortran +elpa +tests +scalapack +cuda ^mpich@${MPICH_VERSION} ^intel-oneapi-mkl+cluster ^spla ^spfft+cuda ^elpa+cuda"
 RUN spack -e sirius-gpu-env add $SPEC_GPU
+RUN spack -e sirius-gpu-env concretize
 RUN spack -e sirius-gpu-env install
 
-ENV SPEC_CPU="sirius@develop%gcc build_type=Release +fortran +elpa +tests +scalapack ^mpich@${MPICH_VERSION} ^intel-oneapi-mkl+cluster ^spla ^spfft ^elpa"
-
-# install all dependencies
-RUN spack install --only=dependencies $SPEC_CPU
-
 RUN spack env create --with-view /opt/sirius-cpu sirius-cpu-env
+ENV SPEC_CPU="sirius@develop%gcc build_type=Release +fortran +elpa +tests +scalapack ^mpich@${MPICH_VERSION} ^intel-oneapi-mkl+cluster ^spla ^spfft ^elpa"
 RUN spack -e sirius-cpu-env add $SPEC_CPU
-RUN spack -e sirius-cpu-env install
+RUN spack -e sirius-cpu-env --fresh concretize
+RUN spack -e sirius-cpu-env --fresh install
