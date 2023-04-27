@@ -34,7 +34,7 @@ run sirius develop hohgant cpu:
     - $TEST_COMMAND
 
 run sirius develop hohgant hwmaint cpu:
-  extends: .run-test-hohgant-cpu
+  extends: .run-test-hohgant-maint
   needs: ["build sirius-develop image"]
   variables:
     USE_MPI: 'NO'
@@ -42,7 +42,6 @@ run sirius develop hohgant hwmaint cpu:
     SLURM_CPUS_PER_TASK: 8
     OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
     SLURM_NTASKS: 16
-    SLURM_JOB_NODELIST: nid002536
     TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
   script:
     - cd SIRIUS/test/Si63Ge
