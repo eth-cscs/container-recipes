@@ -55,18 +55,22 @@ include:
     reports:
       junit: report.xml
 
-.run-script-test:
+# template to run tests on Hihgant cpu partition
+# BASE_IMAGE variable must be provided
+.run-test-hohgant-cpu:
+  extends: .container-runner-hohgant-zen2
   stage: run
-  tags: ['hohgant-login-baremetal']
   variables:
     GIT_STRATEGY: fetch
+    MPICH_MAX_THREAD_SAFETY: multiple
+    CSCS_REGISTRY_LOGIN: 'YES'
+    PULL_IMAGE: 'YES'
+    SLURM_HINT: nomultithread
+    SLURM_UNBUFFEREDIO: ''
+    SLURM_WAIT: 0
+    SLURM_TIMELIMIT: "30:00"
+  image: $BASE_IMAGE
 
-#.run-slurm-job:
-#  extends: .container-runner-hohgant-zen2
-#  stage: run
-#  variables:
-#    GIT_STRATEGY: fetch
-#
 stages:
   - build
   - run

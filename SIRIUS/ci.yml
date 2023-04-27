@@ -5,60 +5,46 @@ build sirius-develop image:
     NAME_TAG: 'sirius-develop'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=60"]'
 
-run sirius develop hohgant hwmaint cpu mpi-hook:
-  extends: .run-script-test
-  needs: ["build sirius-develop image"]
-  script:
-    - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
-    - cd SIRIUS/test/Si63Ge
-    - export OMP_NUM_THREADS=8
-    - srun --nodelist=nid002536 -N1 -n32 -c8 -u --mpi=pmi2 sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --workdir=$PWD -t $BASE_IMAGE /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
-
 run sirius develop hohgant cpu mpi-hook:
-  extends: .container-runner-hohgant-zen2
+  extends: .run-test-hohgant-cpu
   needs: ["build sirius-develop image"]
-  stage: run
   variables:
     USE_MPI: 'YES'
-    GIT_STRATEGY: fetch
-    MPICH_MAX_THREAD_SAFETY: multiple
-    CSCS_REGISTRY_LOGIN: 'YES'
-    PULL_IMAGE: 'YES'
-    SLURM_HINT: nomultithread
     SLURM_JOB_NUM_NODES: 1
-    SLURM_UNBUFFEREDIO: ''
-    SLURM_WAIT: 0
-    OMP_NUM_THREADS: 8
     SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
     SLURM_NTASKS: 16
-    SLURM_TIMELIMIT: "30:00"
     TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
-  image: $BASE_IMAGE
   script:
     - cd SIRIUS/test/Si63Ge
     - $TEST_COMMAND
-
 
 run sirius develop hohgant cpu:
-  extends: .container-runner-hohgant-zen2
+  extends: .run-test-hohgant-cpu
   needs: ["build sirius-develop image"]
-  stage: run
   variables:
     USE_MPI: 'NO'
-    GIT_STRATEGY: fetch
-    MPICH_MAX_THREAD_SAFETY: multiple
-    CSCS_REGISTRY_LOGIN: 'YES'
-    PULL_IMAGE: 'YES'
-    SLURM_HINT: nomultithread
     SLURM_JOB_NUM_NODES: 1
-    SLURM_UNBUFFEREDIO: ''
-    SLURM_WAIT: 0
-    OMP_NUM_THREADS: 8
     SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
     SLURM_NTASKS: 16
-    SLURM_TIMELIMIT: "30:00"
     TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
-  image: $BASE_IMAGE
   script:
     - cd SIRIUS/test/Si63Ge
     - $TEST_COMMAND
+
+run sirius develop hohgant hwmaint cpu:
+  extends: .run-test-hohgant-cpu
+  needs: ["build sirius-develop image"]
+  variables:
+    USE_MPI: 'NO'
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 16
+    SLURM_JOB_NODELIST: nid002536
+    TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+  script:
+    - cd SIRIUS/test/Si63Ge
+    - $TEST_COMMAND
+
