@@ -74,7 +74,7 @@ include:
 # template to run tests on hohgant maintenance node
 # BASE_IMAGE variable must be provided
 .run-test-hohgant-maint:
-    extends: .container-runner-hohgant
+  extends: .container-runner-hohgant
   stage: run
   variables:
     GIT_STRATEGY: fetch
