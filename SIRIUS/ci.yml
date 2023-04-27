@@ -15,7 +15,17 @@ run sirius develop hohgant cpu:
     - export OMP_NUM_THREADS=8
     - srun --partition=cpu -N1 -n32 -c8 -u --mpi=pmi2 sarus run --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --workdir=$PWD -t $BASE_IMAGE /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
 
-run sirius develop hohgant cpu mpi:
+run sirius develop hohgant hwmaint cpu native-mpi:
+  extends: .run-script-test
+  needs: ["build sirius-develop image"]
+  script:
+    - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
+    - git clone --branch develop https://github.com/electronic-structure/SIRIUS.git SIRIUS-dev
+    - cd SIRIUS-dev/validation/Si63Ge
+    - export OMP_NUM_THREADS=8
+    - srun --nodelist=nid002536 -N1 -n32 -c8 -u --mpi=pmi2 sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --workdir=$PWD -t $BASE_IMAGE /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
+run sirius develop hohgant cpu native-mpi:
   extends: .run-script-test
   needs: ["build sirius-develop image"]
   script:
