@@ -31,7 +31,6 @@ include:
 
 # template to run reframe tests
 .run-reframe-test:
-  extends: .container-runner-hohgant
   stage: run
   tags: ['hohgant-login-baremetal']
   variables:
@@ -55,6 +54,12 @@ include:
       - stage/**/*.err
     reports:
       junit: report.xml
+
+.run-script-test:
+  stage: run
+  tags: ['hohgant-login-baremetal']
+  variables:
+    GIT_STRATEGY: 'none'
 
 stages:
   - build

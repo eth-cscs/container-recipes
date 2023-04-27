@@ -6,15 +6,21 @@ build sirius-develop image:
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=60"]'
 
 run sirius develop hohgant cpu:
-  extends: .container-runner-hohgant
-  stage: run
-  tags: ['hohgant-login-baremetal']
-  variables:
-    GIT_STRATEGY: fetch
+  extends: .run-script-test
+  needs: ["build sirius-develop image"]
   script:
     - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
-    - rm -rf ./SIRIUS
-    - git clone --branch develop https://github.com/electronic-structure/SIRIUS.git
-    - cd SIRIUS/validation/Si63Ge
+    - git clone --branch develop https://github.com/electronic-structure/SIRIUS.git SIRIUS-dev
+    - cd SIRIUS-dev/validation/Si63Ge
     - export OMP_NUM_THREADS=8
     - srun --partition=cpu -N1 -n32 -c8 -u --mpi=pmi2 sarus run --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --workdir=$PWD -t $BASE_IMAGE /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
+run sirius develop hohgant cpu mpi:
+  extends: .run-script-test
+  needs: ["build sirius-develop image"]
+  script:
+    - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
+    - git clone --branch develop https://github.com/electronic-structure/SIRIUS.git SIRIUS-dev
+    - cd SIRIUS-dev/validation/Si63Ge
+    - export OMP_NUM_THREADS=8
+    - srun --partition=cpu -N1 -n32 -c8 -u --mpi=pmi2 sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --workdir=$PWD -t $BASE_IMAGE /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
