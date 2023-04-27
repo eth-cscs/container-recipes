@@ -59,7 +59,7 @@ include:
   stage: run
   tags: ['hohgant-login-baremetal']
   variables:
-    GIT_STRATEGY: 'none'
+    GIT_STRATEGY: fetch
 
 stages:
   - build
