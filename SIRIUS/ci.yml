@@ -32,7 +32,7 @@ run sirius develop hohgant cpu mpi-hook:
     SLURM_CPUS_PER_TASK: 8
     SLURM_NTASKS: 16
     SLURM_TIMELIMIT: "30:00"
-    TEST_COMMAND: /sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+    TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
   image: $BASE_IMAGE
   script:
     - cd SIRIUS/test/Si63Ge
@@ -57,7 +57,7 @@ run sirius develop hohgant cpu:
     SLURM_CPUS_PER_TASK: 8
     SLURM_NTASKS: 16
     SLURM_TIMELIMIT: "30:00"
-    TEST_COMMAND: /sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+    TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
   image: $BASE_IMAGE
   script:
     - cd SIRIUS/test/Si63Ge
