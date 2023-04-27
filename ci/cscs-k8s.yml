@@ -61,6 +61,12 @@ include:
   variables:
     GIT_STRATEGY: fetch
 
+#.run-slurm-job:
+#  extends: .container-runner-hohgant-zen2
+#  stage: run
+#  variables:
+#    GIT_STRATEGY: fetch
+#
 stages:
   - build
   - run
