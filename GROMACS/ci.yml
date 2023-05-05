@@ -1,0 +1,6 @@
+build gromacs image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: GROMACS/2021.5/CPU/MPICH/4.1/Dockerfile
+    NAME_TAG: 'GROMACS-2021.5-cpu'
+
