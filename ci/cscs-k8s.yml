@@ -9,6 +9,7 @@ include:
 # the following variables must be provided:
 #  - DOCKERFILE : path/name of the dockerfile
 #  - NAME_TAG : unique tag that will be used to store final image at the persistent location inside JFrog
+#  - DOCKER_BUILD_ARGS: (optional) a dictionary of arguments for building the image
 .build-image:
   extends: .container-builder
   stage: build
