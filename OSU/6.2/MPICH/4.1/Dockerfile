@@ -58,5 +58,5 @@ RUN wget -q http://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchma
 # Add the location of the get_local_rank utility to PATH
 ENV PATH=/usr/local/libexec/osu-micro-benchmarks:$PATH
 
-WORKDIR /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt
+WORKDIR /usr/local/libexec/osu-micro-benchmarks/mpi
 
