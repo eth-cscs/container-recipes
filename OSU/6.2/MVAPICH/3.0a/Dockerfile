@@ -32,7 +32,7 @@ RUN wget -q https://github.com/ofiwg/libfabric/archive/v${libfabric_version}.tar
     && cd .. \
     && rm -rf v${libfabric_version}.tar.gz libfabric-${libfabric_version}
 
-# Install MVAPICH 3.0a configuring specifically for libfabric CXI provider
+# Install MVAPICH 3.0a
 RUN wget -q http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-${mpi_version}.tar.gz \
     && tar xf mvapich2-${mpi_version}.tar.gz \
     && cd mvapich2-${mpi_version} \
@@ -57,5 +57,5 @@ RUN wget -q http://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchma
 # Add the location of the get_local_rank utility to PATH
 ENV PATH=/usr/local/libexec/osu-micro-benchmarks:$PATH
 
-WORKDIR /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt
+WORKDIR /usr/local/libexec/osu-micro-benchmarks/mpi
 
