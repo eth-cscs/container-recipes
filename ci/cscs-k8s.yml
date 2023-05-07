@@ -3,6 +3,7 @@ include:
   - local: '/QuantumESPRESSO/ci.yml'
   - local: '/GROMACS/ci.yml'
   - local: '/SIRIUS/ci.yml'
+  - local: '/OSU/ci.yml'
 
 # template for building images
 # the following variables must be provided:

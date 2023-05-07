@@ -1,0 +1,6 @@
+build osu mpich image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: OSU/6.2/MPICH/4.1/Dockerfile
+    NAME_TAG: 'osu-6.2-mpich'
+
