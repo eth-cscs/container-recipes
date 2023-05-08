@@ -18,15 +18,13 @@ build osu mpich image:
     SLURM_CPUS_PER_TASK: 1
     SLURM_NTASKS: 2
 
-run osu collective mpich hohgant cpu:
+run osu allreduce mpich hohgant cpu:
   extends: .run-osu-collective-test-hohgant-cpu
   needs: ["build osu mpich image"]
-  variables:
-    USE_MPI: 'NO'
   script:
     - /usr/local/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce
 
-run osu collective mpich hohgant cpu:
+run osu allreduce mpich hohgant cpu mpi-hook:
   extends: .run-osu-collective-test-hohgant-cpu
   needs: ["build osu mpich image"]
   variables:
@@ -37,8 +35,6 @@ run osu collective mpich hohgant cpu:
 run osu latency mpich hohgant cpu:
   extends: .run-osu-p2p-test-hohgant-cpu
   needs: ["build osu mpich image"]
-  variables:
-    USE_MPI: 'NO'
   script:
     - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
 
@@ -53,8 +49,6 @@ run osu latency mpich hohgant cpu mpi-hook:
 run osu bw mpich hohgant cpu:
   extends: .run-osu-p2p-test-hohgant-cpu
   needs: ["build osu mpich image"]
-  variables:
-    USE_MPI: 'NO'
   script:
     - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw
 
