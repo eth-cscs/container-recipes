@@ -12,9 +12,7 @@ ENV MPICH_VERSION=3.4.3
 
 ENV CMAKE_VERSION=3.26.3
 
-RUN apt-get -y update
-
-RUN apt-get install -y apt-utils
+RUN apt-get -y update && apt-get install -y apt-utils
 
 # install basic tools
 RUN apt-get install -y gcc g++ gfortran git make unzip file \
@@ -49,7 +47,7 @@ RUN spack spec $SPEC
 
 RUN spack install --only=dependencies $SPEC
 
-ARG QE_VERSION=7.1
+ARG QE_VERSION=qe-7.1
 
 RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.tar.gz && \
     tar zxvf q-e-${QE_VERSION}.tar.gz
@@ -79,8 +77,8 @@ FROM ubuntu:22.04
 RUN apt-get -y update
 RUN apt-get install -y apt-utils
 
-COPY --from=builder /opt/local/qe-gpu/bin/pw.x /qe-gpu/pw.x
-COPY --from=builder /opt/local/qe-cpu/bin/pw.x /qe-cpu/pw.x
+COPY --from=builder /opt/local/qe-gpu /opt/local/qe-gpu
+COPY --from=builder /opt/local/qe-cpu /opt/local/qe-cpu
 
 # copy only necessary *.so libraries, required by the application
 COPY --from=builder /stage-copy/opt /opt
