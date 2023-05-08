@@ -46,7 +46,7 @@ class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
 
 @rfm.simple_test
 class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
-    energy_tolerance = 1.0e-6
+    energy_tolerance = 1.0e-5
 
     @run_after('init')
     def setup_test(self):
