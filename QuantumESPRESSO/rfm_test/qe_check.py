@@ -15,7 +15,7 @@ class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
     qe_image = variable(str, value='NULL')
     variant = parameter(['prod'])
     executable = 'pw.x'
-    executable_opts = ['-in', 'ausurf.in', '-npool', '2']
+    executable_opts = ['-in', 'ausurf.in']
     extra_resources = {
         'switches': {
             'num_switches': 1
@@ -46,7 +46,7 @@ class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
 
 @rfm.simple_test
 class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
-    energy_tolerance = 1.0e-5
+    energy_tolerance = 1.0e-6
 
     @run_after('init')
     def setup_test(self):
