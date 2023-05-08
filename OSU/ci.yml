@@ -28,3 +28,15 @@ run osu latency mpich hohgant cpu:
     SLURM_NTASKS: 2
   script:
     - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+
+run osu latency mpich hohgant cpu mpi-hook:
+  extends: .run-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  variables:
+    USE_MPI: 'YES'
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 2
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
