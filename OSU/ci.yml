@@ -7,16 +7,17 @@ build osu mpich image:
 .run-osu-collective-test-hohgant-cpu:
   extends: .run-test-hohgant-cpu
   variables:
-    SLURM_JOB_NUM_NODES: 1
+    SLURM_JOB_NUM_NODES: 2
     SLURM_CPUS_PER_TASK: 1
-    SLURM_NTASKS: 128
+    SLURM_NTASKS: 256
 
 .run-osu-p2p-test-hohgant-cpu:
   extends: .run-test-hohgant-cpu
   variables:
-    SLURM_JOB_NUM_NODES: 1
+    SLURM_JOB_NUM_NODES: 2
     SLURM_CPUS_PER_TASK: 1
     SLURM_NTASKS: 2
+    SLURM_NTASKS_PER_NODE: 1
 
 run osu allreduce mpich hohgant cpu:
   extends: .run-osu-collective-test-hohgant-cpu
