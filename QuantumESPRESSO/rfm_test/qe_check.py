@@ -75,7 +75,7 @@ class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
     @run_after('setup')
     def setup_container_platform(self):
         self.container_platform.image = self.qe_image
-        self.container_platform.with_mpi = True 
+        self.container_platform.with_mpi = False
         command = f'/qe/{self.executable} {" ".join(self.executable_opts)}'
         self.container_platform.pull_image = False
         self.container_platform.command = command 
