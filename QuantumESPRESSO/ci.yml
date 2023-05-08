@@ -4,7 +4,15 @@ build qe71 image:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
     QE_VERSION: 'qe-7.1'
     NAME_TAG: 'qe71'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
+
+build qe71 image v2:
+  extends: .build-image
+  variables:
+    DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile.v2
+    QE_VERSION: 'qe-7.1'
+    NAME_TAG: 'qe71'
+    DOCKER_BUILD_ARGS: '["QE_VERSION=$QE_VERSION", "QE_ENABLE_SCALAPACK=1"]'
 
 build qe72 image:
   extends: .build-image
@@ -12,7 +20,7 @@ build qe72 image:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
     QE_VERSION: 'qe-7.2'
     NAME_TAG: 'qe72'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
 
 build qe-develop image:
   extends: .build-image
@@ -20,10 +28,10 @@ build qe-develop image:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
     QE_VERSION: 'develop'
     NAME_TAG: 'qe-dev'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=60", "QE_VERSION=$QE_VERSION"]'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
 
 test qe71 image hohgant:
   extends: .run-reframe-test
-  needs: ["build qe71 image"]
+  needs: ["build qe71 image v2"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
