@@ -4,14 +4,14 @@ build osu mpich image:
     DOCKERFILE: OSU/6.2/MPICH/4.1/Dockerfile
     NAME_TAG: 'osu-6.2-mpich'
 
-.run-osu-collective-test-hohgant-cpu
+.run-osu-collective-test-hohgant-cpu:
   extends: .run-test-hohgant-cpu
   variables:
     SLURM_JOB_NUM_NODES: 1
     SLURM_CPUS_PER_TASK: 1
     SLURM_NTASKS: 128
 
-.run-osu-p2p-test-hohgant-cpu
+.run-osu-p2p-test-hohgant-cpu:
   extends: .run-test-hohgant-cpu
   variables:
     SLURM_JOB_NUM_NODES: 1
