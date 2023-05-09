@@ -74,6 +74,22 @@ include:
     SLURM_TIMELIMIT: "30:00"
   image: $BASE_IMAGE
 
+# template to run tests on hohgant nvidia gpu partition
+# BASE_IMAGE variable must be provided
+.run-test-hohgant-nvgpu:
+  extends: .container-runner-hohgant-a100
+  stage: run
+  variables:
+    GIT_STRATEGY: fetch
+    MPICH_MAX_THREAD_SAFETY: multiple
+    CSCS_REGISTRY_LOGIN: 'YES'
+    PULL_IMAGE: 'YES'
+    SLURM_HINT: nomultithread
+    SLURM_UNBUFFEREDIO: ''
+    SLURM_WAIT: 0
+    SLURM_TIMELIMIT: "30:00"
+  image: $BASE_IMAGE
+
 # template to run tests on hohgant maintenance node
 # BASE_IMAGE variable must be provided
 .run-test-hohgant-maint:
