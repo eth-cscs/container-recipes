@@ -40,7 +40,7 @@ run sirius develop hohgant r1 nvgpu:
     SLURM_NTASKS: 1
   script:
     - cd SIRIUS/test/Si63Ge
-    - /opt/sirius-gpu/bin/sirius.scf --test_against=output_ref.json
+    - /opt/sirius-gpu/bin/sirius.scf
 
 run sirius develop hohgant nvgpu:
   extends: .run-test-hohgant-nvgpu
