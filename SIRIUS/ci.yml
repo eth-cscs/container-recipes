@@ -1,6 +1,7 @@
 build sirius-develop image:
   extends: .build-image
   variables:
+    CSCS_REBUILD_POLICY: always
     DOCKERFILE: SIRIUS/gcc-mkl/Dockerfile
     NAME_TAG: 'sirius-develop'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
@@ -52,7 +53,7 @@ run sirius develop hohgant nvgpu:
     SLURM_NTASKS: 4
   script:
     - cd SIRIUS/test/Si63Ge
-    - /opt/sirius-gpu/bin/sirius.scf --control.mpi_grid_dims=1:4 --test_against=output_ref.json
+    - /opt/sirius-gpu/bin/sirius.scf --test_against=output_ref.json
 
 run sirius develop hohgant nvgpu mpi-hook:
   extends: .run-test-hohgant-nvgpu
