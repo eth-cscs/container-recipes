@@ -1,3 +1,6 @@
+include:
+  - local: '/ci/common.yml'
+
 build osu mpich image:
   extends: .build-image
   variables:
