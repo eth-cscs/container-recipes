@@ -1,3 +1,6 @@
+include:
+  - local: '/ci/common.yml'
+
 build sirius-develop image:
   extends: .build-image
   variables:
@@ -31,8 +34,8 @@ run sirius develop hohgant cpu mpi-hook:
     - cd SIRIUS/test/Si63Ge
     - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
 
-run sirius develop hohgant r1 nvgpu:
-  extends: .run-test-hohgant-nvgpu
+run sirius develop hohgant r1 a100:
+  extends: .run-test-hohgant-a100
   needs: ["build sirius-develop image"]
   variables:
     SLURM_JOB_NUM_NODES: 1
@@ -43,8 +46,8 @@ run sirius develop hohgant r1 nvgpu:
     - cd SIRIUS/test/Si63Ge
     - /opt/sirius-gpu/bin/sirius.scf
 
-run sirius develop hohgant nvgpu:
-  extends: .run-test-hohgant-nvgpu
+run sirius develop hohgant a100:
+  extends: .run-test-hohgant-a100
   needs: ["build sirius-develop image"]
   variables:
     SLURM_JOB_NUM_NODES: 1
@@ -55,8 +58,8 @@ run sirius develop hohgant nvgpu:
     - cd SIRIUS/test/Si63Ge
     - /opt/sirius-gpu/bin/sirius.scf --test_against=output_ref.json
 
-run sirius develop hohgant nvgpu mpi-hook:
-  extends: .run-test-hohgant-nvgpu
+run sirius develop hohgant a100 mpi-hook:
+  extends: .run-test-hohgant-a100
   needs: ["build sirius-develop image"]
   variables:
     USE_MPI: 'YES'
