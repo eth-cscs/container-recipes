@@ -13,11 +13,11 @@ stages:
   - run
   - deploy
 ```
-and each stage can define multiple jobs that gitlab runner will execute.
+and each stage can define multiple jobs that GitLab runner will execute.
 
 
 # Adding new Docker recipes
-New recipes are added via a pull request to main branch. Each PR must contain:
+New recipes are added via a pull request to the `main` branch. Each PR must contain:
  - one or more of the Dockerfiles
  - ci.yml script that drives the CI/CD pipeline
  - `README.md` description file of the container image(s)
