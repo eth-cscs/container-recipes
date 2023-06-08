@@ -108,7 +108,7 @@ include:
   stage: deploy
   variables:
     DOCKERFILE: ci/deploy.Dockerfile
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$APP/$NAME_TAG
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$APP:$VERSION_TAG
     DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
 
 stages:

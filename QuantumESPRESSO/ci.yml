@@ -44,4 +44,4 @@ deploy qe71 image:
   needs: ["build qe71 image", "test qe71 image hohgant"]
   variables:
     APP: 'quantumespresso'
-    NAME_TAG: 'qe:71'
+    VERSION_TAG: '7.1'
