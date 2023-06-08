@@ -38,3 +38,10 @@ test qe71 image hohgant:
   needs: ["build qe71 image"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
+
+deploy qe71 image:
+  extends: .deploy-image-jfrog
+  needs: ["test qe71 image hohgant"]
+  variables:
+    APP: 'QuantumESPRESSO'
+    NAME_TAG: 'qe71'

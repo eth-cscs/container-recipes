@@ -103,6 +103,12 @@ include:
     SLURM_JOB_NODELIST: nid002536
   image: $BASE_IMAGE
 
+.deploy-image-jfrog:
+  extends: .container-builder
+  stage: deploy
+  script: "a magic command to push to  jfrog.svc.cscs.ch/contbuild/apps/name-of-the-app/image-name"
+
 stages:
   - build
   - run
+  - deploy
