@@ -41,7 +41,7 @@ test qe71 image hohgant:
 
 deploy qe71 image:
   extends: .deploy-image-jfrog
-  needs: ["test qe71 image hohgant"]
+  needs: ["build qe71 image", "test qe71 image hohgant"]
   variables:
     APP: 'QuantumESPRESSO'
-    NAME_TAG: 'qe71'
+    NAME_TAG: 'qe:71'
