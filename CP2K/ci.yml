@@ -5,9 +5,8 @@ build cp2k-develop image:
   extends: .build-image
   variables:
     CSCS_REBUILD_POLICY: always
-    DOCKERFILE: CP2K/gcc-mkl/Dockerfile
+    DOCKERFILE: CP2K/gcc-mkl-cpu/Dockerfile
     NAME_TAG: 'cp2k-develop'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
 
 
 #run sirius develop hohgant cpu:
