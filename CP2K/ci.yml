@@ -9,6 +9,7 @@ build cp2k-develop image:
     NAME_TAG: 'cp2k-develop'
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
 
+
 #run sirius develop hohgant cpu:
 #  extends: .run-test-hohgant-cpu
 #  needs: ["build sirius-develop image"]
