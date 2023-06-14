@@ -1,5 +1,8 @@
-FROM ubuntu:23.04 as builder
+FROM docker.io/nvidia/cuda:12.1.0-devel-ubuntu22.04 as builder
 
+# Setup CUDA environment.
+ENV CUDA_PATH /usr/local/cuda
+ENV LD_LIBRARY_PATH /usr/local/cuda/lib64
 ARG CUDA_ARCH=80
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -7,7 +10,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV FORCE_UNSAFE_CONFIGURE 1
 
 ENV PATH="/spack/bin:${PATH}"
-
+ENV LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64/stubs
 ENV MPICH_VERSION=4.0.3
 ENV CMAKE_VERSION=3.25.2
 RUN apt-get update -qq
@@ -34,6 +37,7 @@ RUN yq -i '.compilers[0].compiler.flags.fflags = "-fallow-argument-mismatch"' /r
 RUN ls -lap /cp2k/ci 
 RUN cp -r /cp2k/ci/spack /root/spack-recipe
 RUN spack repo add /root/spack-recipe/ --scope user
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
 
 # for the MPI hook
 RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
@@ -41,7 +45,7 @@ RUN ldconfig
 
 # no need to use spla offloading on cpu only version
 ENV SPACK_ROOT=/spack 
-ENV SPEC_MKL="cp2k@master%gcc build_system=cmake build_type=Release ~libint smm=libxsmm +spglib +cosma +mpi +openmp +cuda cuda_arch=${CUDA_ARCH} ^intel-oneapi-mkl+cluster ^cosma+scalapack+shared+cuda~apps~tests ^mpich@${MPICH_VERSION} ^dbcsr+cuda cuda_arch=70"
+ENV SPEC_MKL="cp2k@master%gcc build_system=cmake build_type=Release ~libint smm=libxsmm +spglib +cosma +mpi +openmp +cuda cuda_arch=${CUDA_ARCH} ^intel-oneapi-mkl+cluster ^cosma+scalapack+shared+cuda~apps~tests ^mpich@${MPICH_VERSION} ^dbcsr@develop+cuda~shared cuda_arch=70"
 
 # install all dependencies
 RUN spack env create -d /opt/cp2k-nvidia-gpu
