@@ -1,13 +1,11 @@
 include:
   - local: '/ci/common.yml'
 
-build qe71 image:
+build qe72 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
-    QE_VERSION: 'qe-7.1'
-    NAME_TAG: 'qe71'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
 
 #build qe71 image v2:
 #  extends: .build-image
@@ -17,31 +15,30 @@ build qe71 image:
 #    NAME_TAG: 'qe71'
 #    DOCKER_BUILD_ARGS: '["QE_VERSION=$QE_VERSION", "QE_ENABLE_SCALAPACK=1"]'
 
-build qe72 image:
-  extends: .build-image
-  variables:
-    DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
-    QE_VERSION: 'qe-7.2'
-    NAME_TAG: 'qe72'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
+#build qe72 image:
+#  extends: .build-image
+#  variables:
+#    DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
+#    QE_VERSION: 'qe-7.2'
+#    NAME_TAG: 'qe72'
+#    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
 
 build qe-develop image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc-mkl/Dockerfile
-    QE_VERSION: 'develop'
-    NAME_TAG: 'qe-dev'
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
-test qe71 image hohgant:
+test qe72 image hohgant:
   extends: .run-reframe-test
-  needs: ["build qe71 image"]
+  needs: ["build qe72 image"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
-deploy qe71 image:
+deploy qe72 image:
   extends: .deploy-image-jfrog
-  needs: ["build qe71 image", "test qe71 image hohgant"]
+  needs: ["build qe72 image", "test qe72 image hohgant"]
   variables:
     APP: 'quantumespresso'
-    VERSION_TAG: '7.1'
+    ARCH: 'a100'
+    VERSION_TAG: '7.2'
