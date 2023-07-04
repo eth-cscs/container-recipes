@@ -4,7 +4,6 @@ include:
 # template for building images
 # the following variables must be provided:
 #  - DOCKERFILE : path/name of the dockerfile
-#  - NAME_TAG : unique tag that will be used to store final image at the persistent location inside JFrog
 #  - DOCKER_BUILD_ARGS: (optional) a dictionary of arguments for building the image
 .build-image:
   extends: .container-builder
@@ -18,7 +17,7 @@ include:
   # the following jobs via a dotenv file.
   before_script:
   - DOCKER_SHA_TAG=`sha256sum ${DOCKERFILE} | head -c 16`
-  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/$NAME_TAG-$DOCKER_SHA_TAG
+  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/$DOCKER_SHA_TAG
   - echo "BASE_IMAGE=$PERSIST_IMAGE_NAME" >> build.env
   artifacts:
     reports:
@@ -109,7 +108,7 @@ include:
   stage: deploy
   variables:
     DOCKERFILE: ci/deploy.Dockerfile
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$APP:$VERSION_TAG
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION_TAG
     DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
 
 stages:
