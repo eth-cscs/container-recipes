@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/nvhpc:22.11-devel-cuda_multi-ubuntu22.04 as builder
+FROM nvcr.io/nvidia/nvhpc:23.5-devel-cuda_multi-ubuntu22.04 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -6,9 +6,7 @@ ENV FORCE_UNSAFE_CONFIGURE 1
 
 ENV PATH="/spack/bin:${PATH}"
 
-ENV SPEC="quantum-espresso%nvhpc +libxc +scalapack +openmp +cuda ^mpich ^intel-oneapi-mkl+cluster"
-
-ENV MPICH_VERSION=3.4.3
+ENV MPICH_VERSION=4.1.1
 
 ENV CMAKE_VERSION=3.26.3
 
@@ -38,9 +36,11 @@ RUN spack compiler find
 # explicitly ask for nvhpc installation
 RUN spack install libxc@5.2.3 %nvhpc
 
-RUN spack install --only=dependencies mpich@${MPICH_VERSION} %nvhpc
+RUN spack install --only=dependencies mpich@${MPICH_VERSION} %nvhpc ^libiconv%gcc
 RUN spack install mpich@${MPICH_VERSION} %nvhpc
 RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
+
+ENV SPEC="quantum-espresso%nvhpc +libxc +scalapack +openmp +cuda ^mpich ^intel-oneapi-mkl+cluster threads=openmp"
 
 # show spec
 RUN spack spec $SPEC
