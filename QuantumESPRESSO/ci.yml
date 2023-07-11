@@ -4,7 +4,7 @@ include:
 build qe72 image:
   extends: .build-image
   variables:
-    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
+    DOCKERFILE: QuantumESPRESSO/nvhpc/cpu/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
 
 #build qe71 image v2:
@@ -23,11 +23,11 @@ build qe72 image:
 #    NAME_TAG: 'qe72'
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=$QE_VERSION"]'
 
-build qe-develop image:
-  extends: .build-image
-  variables:
-    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
-    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
+#build qe-develop image:
+#  extends: .build-image
+#  variables:
+#    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
+#    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
 test qe72 image hohgant:
   extends: .run-reframe-test
