@@ -50,7 +50,7 @@ RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.ta
     tar zxvf q-e-${QE_VERSION}.tar.gz
 
 RUN spack env create -d /qe-build-env  --with-view /qe
-RUN spack -e /qe-build-env add openmpi@${OPENMPI_VERSION} %nvhpc fabrics=ofi ^libiconv%gcc
+RUN spack -e /qe-build-env add openmpi@${OPENMPI_VERSION} %nvhpc fabrics=ofi schedulers=slurm ^libiconv%gcc
 RUN spack -e /qe-build-env add libxc@5.2.3 %nvhpc
 RUN spack -e /qe-build-env add quantum-espresso@develop %nvhpc +libxc ~scalapack +openmp ^openmpi ^openblas threads=openmp
 RUN spack -e /qe-build-env develop -p /q-e-${QE_VERSION} quantum-espresso@develop
