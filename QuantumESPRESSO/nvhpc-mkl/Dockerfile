@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/nvhpc:23.5-devel-cuda_multi-ubuntu22.04 as builder
+FROM nvcr.io/nvidia/nvhpc:23.1-devel-cuda_multi-ubuntu22.04 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 

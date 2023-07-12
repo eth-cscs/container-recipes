@@ -1,10 +1,16 @@
 include:
   - local: '/ci/common.yml'
 
-build qe72 image:
+build nvhpc qe72 image:
   extends: .build-image
   variables:
     DOCKERFILE: QuantumESPRESSO/nvhpc/cpu/Dockerfile
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
+
+build gcc qe72 image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: QuantumESPRESSO/gcc/cpu/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
 
 #build qe71 image v2:
@@ -29,16 +35,22 @@ build qe72 image:
 #    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
-test qe72 image hohgant:
+test nvhpc qe72 image hohgant:
   extends: .run-reframe-test
-  needs: ["build qe72 image"]
+  needs: ["build nvhpc qe72 image"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
-deploy qe72 image:
-  extends: .deploy-image-jfrog
-  needs: ["build qe72 image", "test qe72 image hohgant"]
+test gcc qe72 image hohgant:
+  extends: .run-reframe-test
+  needs: ["build gcc qe72 image"]
   variables:
-    APP: 'quantumespresso'
-    ARCH: 'a100'
-    VERSION_TAG: '7.2'
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
+
+    #deploy qe72 image:
+    #  extends: .deploy-image-jfrog
+    #  needs: ["build qe72 image", "test qe72 image hohgant"]
+    #  variables:
+    #    APP: 'quantumespresso'
+    #    ARCH: 'a100'
+    #    VERSION_TAG: '7.2'
