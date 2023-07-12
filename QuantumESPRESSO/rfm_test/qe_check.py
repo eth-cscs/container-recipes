@@ -15,7 +15,7 @@ class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
     qe_image = variable(str, value='NULL')
     variant = parameter(['prod'])
     executable = 'pw.x'
-    executable_opts = ['-in', 'ausurf.in', '-npool', '2']
+    executable_opts = ['-in', 'ausurf.in']
     extra_resources = {
         'switches': {
             'num_switches': 1
