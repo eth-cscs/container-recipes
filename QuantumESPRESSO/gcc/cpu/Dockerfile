@@ -46,7 +46,7 @@ RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.ta
 RUN spack env create -d /build-env  --with-view /apps
 RUN spack -e /build-env add mpich@${MPICH_VERSION}
 RUN spack -e /build-env add libxc@5.2.3
-RUN spack -e /build-env add quantum-espresso@develop +libxc ~scalapack +openmp ^mpich ^openblas threads=openmp
+RUN spack -e /build-env add quantum-espresso@develop +libxc +scalapack +openmp ^mpich ^openblas threads=openmp
 RUN spack -e /build-env develop -p /q-e-${QE_VERSION} quantum-espresso@develop
 
 RUN spack -e /build-env concretize

@@ -13,6 +13,12 @@ build gcc qe72 image:
     DOCKERFILE: QuantumESPRESSO/gcc/cpu/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
 
+build gcc qe71 image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: QuantumESPRESSO/gcc/cpu/Dockerfile
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.1"]'
+
 #build qe71 image v2:
 #  extends: .build-image
 #  variables:
@@ -44,6 +50,12 @@ test nvhpc qe72 image hohgant:
 test gcc qe72 image hohgant:
   extends: .run-reframe-test
   needs: ["build gcc qe72 image"]
+  variables:
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
+
+test gcc qe71 image hohgant:
+  extends: .run-reframe-test
+  needs: ["build gcc qe71 image"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
