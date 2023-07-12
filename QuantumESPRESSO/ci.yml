@@ -47,23 +47,26 @@ build gcc qe71 image:
 #    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
-test nvhpc qe72 image hohgant:
+.test-image:
   extends: .run-reframe-test
-  needs: ["build nvhpc qe72 image"]
   variables:
     REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
+
+test nvhpc qe72 image hohgant:
+  extends: .test-image
+  needs: ["build nvhpc qe72 image"]
+
+test nvhpc cuda qe72 image hohgant:
+  extends: .test-image
+  needs: ["build nvhpc cuda qe72 image"]
 
 test gcc qe72 image hohgant:
-  extends: .run-reframe-test
+  extends: .test-image
   needs: ["build gcc qe72 image"]
-  variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
 test gcc qe71 image hohgant:
-  extends: .run-reframe-test
+  extends: .test-image
   needs: ["build gcc qe71 image"]
-  variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
 
     #deploy qe72 image:
     #  extends: .deploy-image-jfrog
