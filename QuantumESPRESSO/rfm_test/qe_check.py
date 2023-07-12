@@ -100,6 +100,7 @@ class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
     @run_before('run')
     def set_cpu_binding(self):
         #self.job.launcher.options = ['--cpu-bind=cores', ' --hint=nomultithread']
+        #
         self.job.launcher.options = [' --hint=nomultithread']
         if self.current_system.name in {'hohgant'}:
             self.job.launcher.options += ['--mpi=pmi2']
