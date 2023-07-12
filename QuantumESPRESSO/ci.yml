@@ -7,6 +7,12 @@ build nvhpc qe72 image:
     DOCKERFILE: QuantumESPRESSO/nvhpc/cpu/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
 
+build nvhpc cuda qe72 image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: QuantumESPRESSO/nvhpc/cuda/Dockerfile
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.2"]'
+
 build gcc qe72 image:
   extends: .build-image
   variables:

@@ -1,6 +1,4 @@
 FROM ubuntu:latest AS builder
-#FROM nvcr.io/nvidia/nvhpc:23.1-runtime-cuda11.8-ubuntu22.04
-#FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -28,17 +26,24 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
 # get latest version of spack
 RUN git clone https://github.com/spack/spack.git
 
-# set the location of packages built by spack
-RUN spack config add config:install_tree:root:/opt/local
-
 # find all external packages
 RUN spack external find --all --not-buildable -p /usr
+
+ARG CUDA_ARCH=80
+
+# set the location of packages built by spack
+RUN spack config add config:install_tree:root:/opt/local
+RUN spack config add packages:all:variants:cuda_arch=${CUDA_ARCH}
 
 # find compilers
 RUN spack compiler find
 
-RUN spack install nvhpc@23.1 %gcc
+ARG NVHPC_VERSION=23.1
 
+# install nvhpc
+RUN spack install nvhpc@${NVHPC_VERSION} %gcc
+
+# add nvhpc compiler
 RUN spack compiler find $(spack location -i nvhpc)/Linux_x86_64/2023/compilers
 
 ARG QE_VERSION=qe-7.1
