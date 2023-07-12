@@ -15,7 +15,7 @@ class QuantumESPRESSOCheck(rfm.RunOnlyRegressionTest):
     qe_image = variable(str, value='NULL')
     variant = parameter(['prod'])
     executable = 'pw.x'
-    executable_opts = ['-in', 'ausurf.in']
+    executable_opts = ['-in', 'ausurf.in', '-npool', '2']
     extra_resources = {
         'switches': {
             'num_switches': 1
@@ -61,7 +61,7 @@ class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
 
         if self.scale == 'small':
             self.energy_reference = -11427.09017218
-            self.num_tasks = 64
+            self.num_tasks = 32
             self.num_tasks_per_node = 32
             self.num_cpus_per_task = 4
             self.num_tasks_per_core = 1
@@ -99,6 +99,7 @@ class QuantumESPRESSOCpuCheck(QuantumESPRESSOCheck):
 
     @run_before('run')
     def set_cpu_binding(self):
-        self.job.launcher.options = ['--cpu-bind=cores', ' --hint=nomultithread']
+        #self.job.launcher.options = ['--cpu-bind=cores', ' --hint=nomultithread']
+        self.job.launcher.options = [' --hint=nomultithread']
         if self.current_system.name in {'hohgant'}:
             self.job.launcher.options += ['--mpi=pmi2']
