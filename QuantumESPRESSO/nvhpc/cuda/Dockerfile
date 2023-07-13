@@ -62,7 +62,8 @@ RUN spack -e ./build-env install
 
 RUN spack clean --all
 
-RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
+#RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
+RUN echo $(spack find --format='{prefix.lib}' libfabric) > /etc/ld.so.conf.d/libfabric.conf
 RUN ldconfig
 
 ###==# build CPU
