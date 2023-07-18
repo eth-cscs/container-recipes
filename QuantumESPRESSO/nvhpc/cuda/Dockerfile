@@ -44,7 +44,7 @@ ARG NVHPC_VERSION=22.5
 RUN spack install nvhpc@${NVHPC_VERSION} %gcc
 
 # add nvhpc compiler
-RUN spack compiler find $(spack location -i nvhpc)/Linux_x86_64/2023/compilers
+RUN spack compiler find $(spack location -i nvhpc)/Linux_x86_64/2022/compilers
 
 ARG QE_VERSION=qe-7.1
 
