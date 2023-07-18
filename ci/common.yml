@@ -17,7 +17,8 @@ include:
   # the following jobs via a dotenv file.
   before_script:
   - DOCKER_SHA_TAG=`sha256sum ${DOCKERFILE} | head -c 16`
-  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/$DOCKER_SHA_TAG
+  - DOCKER_BUILD_ARGS_TAG=`echo ${DOCKER_BUILD_ARGS} | sha256sum | head -c 16`
+  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/$DOCKER_SHA_TAG-$DOCKER_BUILD_ARGS_TAG
   - echo "BASE_IMAGE=$PERSIST_IMAGE_NAME" >> build.env
   artifacts:
     reports:
