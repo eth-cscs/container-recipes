@@ -38,7 +38,7 @@ RUN spack config add packages:all:variants:cuda_arch=${CUDA_ARCH}
 # find compilers
 RUN spack compiler find
 
-ARG NVHPC_VERSION=23.1
+ARG NVHPC_VERSION=22.5
 
 # install nvhpc
 RUN spack install nvhpc@${NVHPC_VERSION} %gcc
