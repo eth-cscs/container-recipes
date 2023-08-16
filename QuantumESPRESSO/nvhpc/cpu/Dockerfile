@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV FORCE_UNSAFE_CONFIGURE 1
 
-ENV PATH="/spack/bin:${PATH}"
+ENV PATH="/spack/bin:/apps/bin/:${PATH}"
 
 ENV OPENMPI_VERSION=4.1.5
 
@@ -44,7 +44,7 @@ ARG NVHPC_VERSION=22.11
 RUN spack install nvhpc@${NVHPC_VERSION} %gcc
 
 # add nvhpc compiler
-RUN spack compiler find $(spack location -i nvhpc)/Linux_x86_64/2022/compilers
+RUN spack compiler find $(spack location -i nvhpc)/Linux_x86_64/${NVHPC_VERSION}/compilers
 
 ARG QE_VERSION=qe-7.1
 
@@ -53,7 +53,7 @@ RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.ta
 
 RUN spack env create -d /build-env  --with-view /apps
 #RUN spack -e /build-env add openmpi@${OPENMPI_VERSION} %nvhpc fabrics=ofi schedulers=slurm ^libiconv%gcc ^slurm%gcc
-RUN spack -e /build-env add mpich@${MPICH_VERSION} %nvhpc ^libiconv%gcc
+RUN spack -e /build-env add mpich@${MPICH_VERSION} %nvhpc ^libiconv%gcc ^libfabric%gcc
 RUN spack -e /build-env add libxc@5.2.3 %nvhpc
 #RUN spack -e /build-env add quantum-espresso@develop %nvhpc +libxc ~scalapack +openmp ^openmpi ^openblas threads=openmp
 RUN spack -e /build-env add quantum-espresso@develop %nvhpc ~cuda +libxc ~scalapack +openmp ^mpich ^openblas threads=openmp
@@ -64,6 +64,6 @@ RUN spack -e /build-env install
 
 RUN spack clean --all
 
-#RUN echo $(spack find --format='{prefix.lib}' libfabric) > /etc/ld.so.conf.d/libfabric.conf
-RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
+RUN echo $(spack find --format='{prefix.lib}' libfabric) > /etc/ld.so.conf.d/libfabric.conf
+#RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
 RUN ldconfig
