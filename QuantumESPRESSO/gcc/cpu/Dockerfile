@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV FORCE_UNSAFE_CONFIGURE 1
 
-ENV PATH="/spack/bin:${PATH}"
+ENV PATH="/spack/bin:/apps/bin/:${PATH}"
 
 ENV OPENMPI_VERSION=4.1.5
 
