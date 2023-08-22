@@ -60,33 +60,38 @@ build gcc qe72 image:
 #    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
-.test-image:
+.test-image-cpu:
   extends: .run-reframe-test
   variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
+
+.test-image-a100:
+  extends: .run-reframe-test
+  variables:
+    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
 
 test nvhpc cpu qe71 image hohgant:
-  extends: .test-image
+  extends: .test-image-cpu
   needs: ["build nvhpc cpu qe71 image"]
 
 test nvhpc cuda qe71 image hohgant:
-  extends: .test-image
+  extends: .test-image-a100
   needs: ["build nvhpc cuda qe71 image"]
 
 test nvhpc cpu qe72 image hohgant:
-  extends: .test-image
+  extends: .test-image-cpu
   needs: ["build nvhpc cpu qe72 image"]
 
 test nvhpc cuda qe72 image hohgant:
-  extends: .test-image
+  extends: .test-image-a100
   needs: ["build nvhpc cuda qe72 image"]
 
 test gcc qe72 image hohgant:
-  extends: .test-image
+  extends: .test-image-cpu
   needs: ["build gcc qe72 image"]
 
 test gcc qe71 image hohgant:
-  extends: .test-image
+  extends: .test-image-cpu
   needs: ["build gcc qe71 image"]
 
     #deploy qe72 image:

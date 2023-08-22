@@ -10,7 +10,7 @@ ENV OPENMPI_VERSION=4.1.5
 
 ENV MPICH_VERSION=4.1.1
 
-ENV CMAKE_VERSION=3.26.3
+ENV CMAKE_VERSION=3.26.4
 
 RUN apt-get -y update && apt-get install -y apt-utils
 
