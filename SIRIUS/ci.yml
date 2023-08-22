@@ -1,24 +1,24 @@
 include:
   - local: '/ci/common.yml'
 
-build sirius-develop image:
+build sirius-develop cpu image:
   extends: .build-image
   variables:
-    CSCS_REBUILD_POLICY: always
+      #CSCS_REBUILD_POLICY: always
     DOCKERFILE: SIRIUS/cpu/Dockerfile
 
-#run sirius develop hohgant cpu:
-#  extends: .run-test-hohgant-cpu
-#  needs: ["build sirius-develop image"]
-#  variables:
-#    SLURM_JOB_NUM_NODES: 1
-#    SLURM_CPUS_PER_TASK: 8
-#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
-#    SLURM_NTASKS: 16
-#  script:
-#    - cd SIRIUS/test/Si63Ge
-#    - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
-#
+run sirius-develop hohgant cpu image:
+  extends: .run-test-hohgant-cpu
+  needs: ["build sirius-develop cpu image"]
+  variables:
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 16
+  script:
+    - cd SIRIUS/test/Si63Ge
+    - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
 #run sirius develop hohgant cpu mpi-hook:
 #  extends: .run-test-hohgant-cpu
 #  needs: ["build sirius-develop image"]
