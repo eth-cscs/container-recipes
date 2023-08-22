@@ -95,10 +95,10 @@ test gcc qe71 image hohgant:
   extends: .test-image-cpu
   needs: ["build gcc qe71 image"]
 
-    #deploy qe72 image:
-    #  extends: .deploy-image-jfrog
-    #  needs: ["build qe72 image", "test qe72 image hohgant"]
-    #  variables:
-    #    APP: 'quantumespresso'
-    #    ARCH: 'a100'
-    #    VERSION_TAG: '7.2'
+deploy qe72 image:
+  extends: .deploy-image-jfrog
+  needs: ["build nvhpc cuda qe72 image", "test nvhpc cuda qe72 image hohgant"]
+  variables:
+    APP: 'quantumespresso'
+    ARCH: 'a100'
+    VERSION_TAG: '7.2'
