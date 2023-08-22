@@ -1,15 +1,22 @@
 include:
   - local: '/ci/common.yml'
 
-build sirius-develop cpu image:
+build sirius-develop cpu:
   extends: .build-image
   variables:
       #CSCS_REBUILD_POLICY: always
     DOCKERFILE: SIRIUS/cpu/Dockerfile
 
-run sirius-develop hohgant cpu image:
+build sirius-develop a100:
+  extends: .build-image
+  variables:
+      #CSCS_REBUILD_POLICY: always
+    DOCKERFILE: SIRIUS/cuda/Dockerfile
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
+
+run sirius-develop hohgant cpu:
   extends: .run-test-hohgant-cpu
-  needs: ["build sirius-develop cpu image"]
+  needs: ["build sirius-develop cpu"]
   variables:
     SLURM_JOB_NUM_NODES: 1
     SLURM_CPUS_PER_TASK: 8
