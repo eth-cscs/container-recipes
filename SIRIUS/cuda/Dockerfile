@@ -43,7 +43,7 @@ RUN spack compiler find
 
 RUN spack env create -d /build-env  --with-view /apps
 RUN spack -e /build-env add mpich@${MPICH_VERSION}
-RUN spack -e /build-env add sirius@develop%gcc build_type=Release +cuda +fortran +elpa +tests +scalapack ^mpich@${MPICH_VERSION} ^openblas threads=openmp ^cuda@11.8 ^elpa+cuda
+RUN spack -e /build-env add sirius@develop%gcc build_type=Release +cuda +fortran +tests +scalapack ^mpich@${MPICH_VERSION} ^openblas threads=openmp ^cuda@11.8
 
 RUN spack -e /build-env concretize
 RUN spack -e /build-env install
