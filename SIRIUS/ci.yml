@@ -14,7 +14,7 @@ build sirius-develop a100:
     DOCKERFILE: SIRIUS/cuda/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
 
-run sirius-develop hohgant cpu:
+test sirius-develop hohgant cpu:
   extends: .run-test-hohgant-cpu
   needs: ["build sirius-develop cpu"]
   variables:
@@ -25,6 +25,18 @@ run sirius-develop hohgant cpu:
   script:
     - cd SIRIUS/test/Si63Ge
     - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
+test sirius-develop hohgant a100:
+  extends: .run-test-hohgant-a100
+  needs: ["build sirius-develop a100"]
+  variables:
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 4
+  script:
+    - cd SIRIUS/test/Si63Ge
+    - sirius.scf --control.std_evp_solver_name=cusolver --control.gen_evp_solver_name=cusolver --test_against=output_ref.json
 
 #run sirius develop hohgant cpu mpi-hook:
 #  extends: .run-test-hohgant-cpu
