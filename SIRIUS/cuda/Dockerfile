@@ -27,7 +27,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
 RUN git clone https://github.com/spack/spack.git
 
 # this is a temporarty fix until spack recipe is updated in the main repo
-COPY ./spack /opt/spack
+COPY ./cuda/spack /opt/spack
 RUN spack repo add --scope system /opt/spack
 
 # find all external packages
