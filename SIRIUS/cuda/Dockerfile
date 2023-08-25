@@ -26,6 +26,10 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
 # get latest version of spack
 RUN git clone https://github.com/spack/spack.git
 
+# this is a temporarty fix until spack recipe is updated in the main repo
+COPY ./spack /opt/spack
+RUN spack repo add --scope system /opt/spack
+
 # find all external packages
 RUN spack external find --all --not-buildable -p /usr
 
@@ -52,4 +56,3 @@ RUN spack clean --all
 
 RUN echo $(spack find --format='{prefix.lib}' libfabric) > /etc/ld.so.conf.d/libfabric.conf
 RUN ldconfig
-
