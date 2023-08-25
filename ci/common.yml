@@ -1,0 +1,118 @@
+include:
+  - remote: 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
+
+# template for building images
+# the following variables must be provided:
+#  - DOCKERFILE : path/name of the dockerfile
+#  - DOCKER_BUILD_ARGS: (optional) a dictionary of arguments for building the image
+.build-image:
+  extends: .container-builder
+  stage: build
+  timeout: 2h
+  # we create a tag that depends on the SHA value of input file, this way
+  # a new base image is only built when the SHA of this file changes
+  # If there are more dependency files that should change the tag-name of the base container
+  # image, they can be added too.
+  # Since the base image name is runtime dependent, we need to carry the value of it to
+  # the following jobs via a dotenv file.
+  before_script:
+  - DOCKER_SHA_TAG=`sha256sum ${DOCKERFILE} | head -c 16`
+  - DOCKER_BUILD_ARGS_TAG=`echo ${DOCKER_BUILD_ARGS} | sha256sum | head -c 16`
+  - export PERSIST_IMAGE_NAME=$CSCS_REGISTRY_PATH/apps/$DOCKER_SHA_TAG-$DOCKER_BUILD_ARGS_TAG
+  - echo "BASE_IMAGE=$PERSIST_IMAGE_NAME" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+  variables:
+    # change to 'always' if you want to rebuild, even if target tag exists already
+    # (if-not-exists is the default, i.e. we could also skip the variable)
+    CSCS_REBUILD_POLICY: if-not-exists
+
+# template to run reframe tests
+.run-reframe-test:
+  stage: run
+  tags: ['hohgant-login-baremetal']
+  variables:
+    GIT_STRATEGY: fetch
+  script:
+    - !reference [.fetch-registry-tokens, script]
+    - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
+    - rm -rf cscs-reframe-tests
+    - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
+    - python3 -m venv venv_reframe
+    - source venv_reframe/bin/activate
+    - pip install reframe-hpc
+    - export RFM_AUTODETECT_XTHOSTNAME=1
+    - export RFM_REMOTE_DETECT=0
+    - ${REFRAME_COMMAND}
+    - deactivate
+  artifacts:
+    when: always
+    paths:
+      - report.xml
+      - stage/**/*.out
+      - stage/**/*.err
+    reports:
+      junit: report.xml
+
+# template to run tests on hohgant cpu partition
+# BASE_IMAGE variable must be provided
+.run-test-hohgant-cpu:
+  extends: .container-runner-hohgant-zen2
+  stage: run
+  variables:
+    GIT_STRATEGY: fetch
+    MPICH_MAX_THREAD_SAFETY: multiple
+    CSCS_REGISTRY_LOGIN: 'YES'
+    PULL_IMAGE: 'YES'
+    SLURM_HINT: nomultithread
+    SLURM_UNBUFFEREDIO: ''
+    SLURM_WAIT: 0
+    SLURM_TIMELIMIT: "30:00"
+  image: $BASE_IMAGE
+
+# template to run tests on hohgant nvidia gpu partition
+# BASE_IMAGE variable must be provided
+.run-test-hohgant-a100:
+  extends: .container-runner-hohgant-a100
+  stage: run
+  variables:
+    GIT_STRATEGY: fetch
+    MPICH_MAX_THREAD_SAFETY: multiple
+    CSCS_REGISTRY_LOGIN: 'YES'
+    PULL_IMAGE: 'YES'
+    SLURM_HINT: nomultithread
+    SLURM_UNBUFFEREDIO: ''
+    SLURM_WAIT: 0
+    SLURM_TIMELIMIT: "30:00"
+  image: $BASE_IMAGE
+
+# template to run tests on hohgant maintenance node
+# BASE_IMAGE variable must be provided
+.run-test-hohgant-maint:
+  extends: .container-runner-hohgant
+  stage: run
+  variables:
+    GIT_STRATEGY: fetch
+    MPICH_MAX_THREAD_SAFETY: multiple
+    CSCS_REGISTRY_LOGIN: 'YES'
+    PULL_IMAGE: 'YES'
+    SLURM_HINT: nomultithread
+    SLURM_UNBUFFEREDIO: ''
+    SLURM_WAIT: 0
+    SLURM_TIMELIMIT: "30:00"
+    SLURM_JOB_NODELIST: nid002536
+  image: $BASE_IMAGE
+
+.deploy-image-jfrog:
+  extends: .container-builder
+  stage: deploy
+  variables:
+    DOCKERFILE: ci/deploy.Dockerfile
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION_TAG
+    DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
+
+stages:
+  - build
+  - run
+  - deploy

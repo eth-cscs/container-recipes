@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/nvhpc:22.11-devel-cuda_multi-ubuntu22.04 as builder
+FROM nvcr.io/nvidia/nvhpc:23.1-devel-cuda_multi-ubuntu22.04 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -6,15 +6,11 @@ ENV FORCE_UNSAFE_CONFIGURE 1
 
 ENV PATH="/spack/bin:${PATH}"
 
-ENV SPEC="quantum-espresso%nvhpc +libxc +scalapack +openmp +cuda ^mpich ^intel-oneapi-mkl+cluster"
+ENV MPICH_VERSION=4.1.1
 
-ENV MPICH_VERSION=3.4.3
+ENV CMAKE_VERSION=3.26.3
 
-ENV CMAKE_VERSION=3.25.2
-
-RUN apt-get -y update
-
-RUN apt-get install -y apt-utils
+RUN apt-get -y update && apt-get install -y apt-utils
 
 # install basic tools
 RUN apt-get install -y gcc g++ gfortran git make unzip file \
@@ -38,27 +34,31 @@ RUN spack external find --all --not-buildable
 RUN spack compiler find
 
 # explicitly ask for nvhpc installation
-RUN spack install libxc%nvhpc
+RUN spack install libxc@5.2.3 %nvhpc
 
-RUN spack install --only=dependencies mpich@${MPICH_VERSION} %nvhpc
+RUN spack install --only=dependencies mpich@${MPICH_VERSION} %nvhpc ^libiconv%gcc
 RUN spack install mpich@${MPICH_VERSION} %nvhpc
 RUN echo $(spack find --format='{prefix.lib}' mpich) > /etc/ld.so.conf.d/mpich.conf
+
+ENV SPEC="quantum-espresso%nvhpc +libxc +scalapack +openmp +cuda ^mpich ^intel-oneapi-mkl+cluster threads=openmp"
 
 # show spec
 RUN spack spec $SPEC
 
 RUN spack install --only=dependencies $SPEC
 
-RUN wget https://gitlab.com/QEF/q-e/-/archive/qe-7.1/q-e-qe-7.1.tar.gz && \
-    tar zxvf q-e-qe-7.1.tar.gz
+ARG QE_VERSION=qe-7.1
+
+RUN wget https://gitlab.com/QEF/q-e/-/archive/${QE_VERSION}/q-e-${QE_VERSION}.tar.gz && \
+    tar zxvf q-e-${QE_VERSION}.tar.gz
 
 # build CPU
-RUN cd /q-e-qe-7.1 && mkdir build-cpu && cd build-cpu &&\
+RUN cd /q-e-${QE_VERSION} && mkdir build-cpu && cd build-cpu &&\
     spack build-env $SPEC -- cmake .. -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON -DQE_ENABLE_OPENMP=1 -DQE_ENABLE_SCALAPACK=1 -DQE_ENABLE_LIBXC=1 -DCMAKE_INSTALL_PREFIX=/opt/local/qe-cpu &&\
     spack build-env $SPEC -- make -j install
 
 # build GPU
-RUN cd /q-e-qe-7.1 && mkdir build-gpu && cd build-gpu &&\
+RUN cd /q-e-${QE_VERSION} && mkdir build-gpu && cd build-gpu &&\
     spack build-env $SPEC -- cmake .. -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON -DQE_ENABLE_OPENMP=1 -DQE_ENABLE_SCALAPACK=0 -DQE_ENABLE_LIBXC=1 -DQE_ENABLE_CUDA=1 -DCMAKE_INSTALL_PREFIX=/opt/local/qe-gpu &&\
     spack build-env $SPEC -- make -j install
 
@@ -77,8 +77,8 @@ FROM ubuntu:22.04
 RUN apt-get -y update
 RUN apt-get install -y apt-utils
 
-COPY --from=builder /opt/local/qe-gpu/bin/pw.x /qe-gpu/pw.x
-COPY --from=builder /opt/local/qe-cpu/bin/pw.x /qe-cpu/pw.x
+COPY --from=builder /opt/local/qe-gpu /opt/local/qe-gpu
+COPY --from=builder /opt/local/qe-cpu /opt/local/qe-cpu
 
 # copy only necessary *.so libraries, required by the application
 COPY --from=builder /stage-copy/opt /opt

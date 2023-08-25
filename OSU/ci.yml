@@ -1,0 +1,66 @@
+include:
+  - local: '/ci/common.yml'
+
+build osu mpich image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: OSU/6.2/MPICH/4.1/Dockerfile
+    NAME_TAG: 'osu-6.2-mpich'
+
+.run-osu-collective-test-hohgant-cpu:
+  extends: .run-test-hohgant-cpu
+  variables:
+    SLURM_JOB_NUM_NODES: 2
+    SLURM_CPUS_PER_TASK: 1
+    SLURM_NTASKS: 256
+
+.run-osu-p2p-test-hohgant-cpu:
+  extends: .run-test-hohgant-cpu
+  variables:
+    SLURM_JOB_NUM_NODES: 2
+    SLURM_CPUS_PER_TASK: 1
+    SLURM_NTASKS: 2
+    SLURM_NTASKS_PER_NODE: 1
+
+run osu allreduce mpich hohgant cpu:
+  extends: .run-osu-collective-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce
+
+run osu allreduce mpich hohgant cpu mpi-hook:
+  extends: .run-osu-collective-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  variables:
+    USE_MPI: 'YES'
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce
+
+run osu latency mpich hohgant cpu:
+  extends: .run-osu-p2p-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+
+run osu latency mpich hohgant cpu mpi-hook:
+  extends: .run-osu-p2p-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  variables:
+    USE_MPI: 'YES'
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+
+run osu bw mpich hohgant cpu:
+  extends: .run-osu-p2p-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw
+
+run osu bw mpich hohgant cpu mpi-hook:
+  extends: .run-osu-p2p-test-hohgant-cpu
+  needs: ["build osu mpich image"]
+  variables:
+    USE_MPI: 'YES'
+  script:
+    - /usr/local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw
+

@@ -1,0 +1,120 @@
+include:
+  - local: '/ci/common.yml'
+
+build sirius-develop cpu:
+  extends: .build-image
+  variables:
+      #CSCS_REBUILD_POLICY: always
+    DOCKERFILE: SIRIUS/cpu/Dockerfile
+
+build sirius-develop a100:
+  extends: .build-image
+  variables:
+      #CSCS_REBUILD_POLICY: always
+    DOCKERFILE: SIRIUS/cuda/Dockerfile
+    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
+
+test sirius-develop hohgant cpu:
+  extends: .run-test-hohgant-cpu
+  needs: ["build sirius-develop cpu"]
+  variables:
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 16
+  script:
+    - cd SIRIUS/test/Si63Ge
+    - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
+test sirius-develop hohgant a100:
+  extends: .run-test-hohgant-a100
+  needs: ["build sirius-develop a100"]
+  variables:
+    SLURM_JOB_NUM_NODES: 1
+    SLURM_CPUS_PER_TASK: 8
+    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+    SLURM_NTASKS: 4
+  script:
+    - cd SIRIUS/test/Si63Ge
+    - sirius.scf --control.std_evp_solver_name=cusolver --control.gen_evp_solver_name=cusolver --test_against=output_ref.json
+
+#run sirius develop hohgant cpu mpi-hook:
+#  extends: .run-test-hohgant-cpu
+#  needs: ["build sirius-develop image"]
+#  variables:
+#    USE_MPI: 'YES'
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 8
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 16
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+#
+#run sirius develop hohgant r1 a100:
+#  extends: .run-test-hohgant-a100
+#  needs: ["build sirius-develop image"]
+#  variables:
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 16
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 1
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-gpu/bin/sirius.scf
+#
+#run sirius develop hohgant a100:
+#  extends: .run-test-hohgant-a100
+#  needs: ["build sirius-develop image"]
+#  variables:
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 16
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 4
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-gpu/bin/sirius.scf --test_against=output_ref.json
+#
+#run sirius develop hohgant a100 mpi-hook:
+#  extends: .run-test-hohgant-a100
+#  needs: ["build sirius-develop image"]
+#  variables:
+#    USE_MPI: 'YES'
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 16
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 4
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-gpu/bin/sirius.scf --control.mpi_grid_dims=1:4 --test_against=output_ref.json
+#
+#
+#      #run sirius develop hohgant hwmaint cpu:
+#      #  extends: .run-test-hohgant-maint
+#      #  needs: ["build sirius-develop image"]
+#      #  variables:
+#      #    USE_MPI: 'NO'
+#      #    SLURM_JOB_NUM_NODES: 1
+#      #    SLURM_CPUS_PER_TASK: 8
+#      #    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#      #    SLURM_NTASKS: 16
+#      #    TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+#      #  script:
+#      #    - cd SIRIUS/test/Si63Ge
+#      #    - $TEST_COMMAND
+#
+#      #run sirius develop hohgant hwmaint cpu mpi-hook:
+#      #  extends: .run-test-hohgant-maint
+#      #  needs: ["build sirius-develop image"]
+#      #  variables:
+#      #    USE_MPI: 'YES'
+#      #    SLURM_JOB_NUM_NODES: 1
+#      #    SLURM_CPUS_PER_TASK: 8
+#      #    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#      #    SLURM_NTASKS: 16
+#      #    TEST_COMMAND: /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+#      #  script:
+#      #    - cd SIRIUS/test/Si63Ge
+#      #    - $TEST_COMMAND
+#      #
+#

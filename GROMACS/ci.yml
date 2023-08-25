@@ -1,0 +1,15 @@
+include:
+  - local: '/ci/common.yml'
+
+build gromacs cpu mpich image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: GROMACS/2021.5/CPU/MPICH/4.1/Dockerfile
+    NAME_TAG: 'gromacs-2021.5-cpu-mpich'
+
+build gromacs cpu openmpi image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: GROMACS/2021.5/CPU/OpenMPI/4.1.4/Dockerfile
+    NAME_TAG: 'gromacs-2021.5-cpu-openmpi'
+

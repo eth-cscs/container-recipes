@@ -1,0 +1,41 @@
+build cp2k-develop cpu image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: CP2K/gcc-mkl-cpu/Dockerfile
+    NAME_TAG: 'cp2k-develop-cpu'
+build cp2k-develop nvidia image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: CP2K/gcc-mkl-gpu/nvidia.Dockerfile
+    NAME-TAG: 'cp2k-develop-gpu'
+build cp2k-develop amd image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: CP2K/gcc-mkl-gpu/AMD.Dockerfile
+
+#run cp2k develop hohgant cpu mpi-hook:
+#  extends: .run-test-hohgant-cpu
+#  needs: ["build cp2k-develop cpu image"]
+#  variables:
+#    USE_MPI: 'YES'
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 8
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 16
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+
+#run cp2k develop hohgant cpu:
+#  extends: .run-test-hohgant-cpu
+#  needs: ["build sirius-develop cpu image"]
+#  variables:
+#    USE_MPI: 'NO'
+#    SLURM_JOB_NUM_NODES: 1
+#    SLURM_CPUS_PER_TASK: 8
+#    OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
+#    SLURM_NTASKS: 16
+#  script:
+#    - cd SIRIUS/test/Si63Ge
+#    - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+

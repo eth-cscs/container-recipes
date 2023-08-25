@@ -1,0 +1,9 @@
+include:
+  - local: '/ci/common.yml'
+
+build pyfr cpu mpich image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: PyFR/CPU/MPICH/4.1/Dockerfile
+    NAME_TAG: 'pyfr-cpu-mpich'
+
