@@ -7,7 +7,7 @@ import reframe.utility.sanity as sn
 
 test_folders = ['Si63Ge']
 
-@sn.sanity_function
+@sanity_function
 def load_json(filename):
     '''This will load a json data from a file.'''
     raw_data = sn.extractsingle(r'(?s).+', filename).evaluate()
@@ -16,14 +16,14 @@ def load_json(filename):
     except json.JSONDecodeError as e:
         raise SanityError('failed to parse JSON file') from e
 
-@sn.sanity_function
+@sanity_function
 def energy_diff(filename, data_ref):
     ''' Return the difference between obtained and reference total energies'''
     parsed_output = load_json(filename)
     return sn.abs(parsed_output['ground_state']['energy']['total'] -
                        data_ref['ground_state']['energy']['total'])
 
-@sn.sanity_function
+@sanity_function
 def stress_diff(filename, data_ref):
     ''' Return the difference between obtained and reference stress tensor components'''
     parsed_output = load_json(filename)
@@ -33,7 +33,7 @@ def stress_diff(filename, data_ref):
     else:
         return sn.abs(0)
 
-@sn.sanity_function
+@sanity_function
 def forces_diff(filename, data_ref):
     ''' Return the difference between obtained and reference atomic forces'''
     parsed_output = load_json(filename)
@@ -44,6 +44,7 @@ def forces_diff(filename, data_ref):
     else:
         return sn.abs(0)
 
+@rfm.simple_test
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     valid_systems = ['hohgant:gpu']
     valid_prog_environs = ['builtin']
