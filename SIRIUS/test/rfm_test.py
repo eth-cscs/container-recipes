@@ -1,77 +1,25 @@
-#import itertools
-#import os
-#import json
-
 import reframe as rfm
 import reframe.utility.sanity as sn
 
-test_folders = ['Si63Ge']
 
-@rfm.simple_test
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
+    test_folder = paramemer(['Si63Ge'])
+    container_image = variable(str, value='NULL')
     valid_systems = ['hohgant:gpu']
     valid_prog_environs = ['builtin']
     container_platform = 'Sarus'
-    container_image = variable(str, value='NULL')
     executable = 'sirius.scf'
     executable_opts = ['--output=output.json']
     strict_check = False
     maintainers = ['antonk']
-
-    data_ref = load_json('output_ref.json')
+    data_ref = 'output_ref.json'
     fout = 'output.json'
     num_tasks = 4
 
-    test_folder = parameter(['Si63Ge'])
-
-    sanity_patterns = sn.all([
-            sn.assert_found(r'converged after', self.stdout, msg="Calculation didn't converge"),
-            sn.assert_lt(energy_diff(fout, data_ref), 1e-5, msg="Total energy is different"),
-            #sn.assert_lt(stress_diff(fout, data_ref), 1e-5, msg="Stress tensor is different"),
-            #sn.assert_lt(forces_diff(fout, data_ref), 1e-5, msg="Atomic forces are different")
-        ])
-
-    @sanity_function
-    def load_json(self, filename):
-        '''This will load a json data from a file.'''
-        raw_data = sn.extractsingle(r'(?s).+', filename).evaluate()
-        try:
-            return json.loads(raw_data)
-        except json.JSONDecodeError as e:
-            raise SanityError('failed to parse JSON file') from e
-
-    @sanity_function
-    def energy_diff(self, filename, data_ref):
-        ''' Return the difference between obtained and reference total energies'''
-        parsed_output = load_json(filename)
-        return sn.abs(parsed_output['ground_state']['energy']['total'] -
-                           data_ref['ground_state']['energy']['total'])
-
-    @sanity_function
-    def stress_diff(self, filename, data_ref):
-        ''' Return the difference between obtained and reference stress tensor components'''
-        parsed_output = load_json(filename)
-        if 'stress' in parsed_output['ground_state'] and 'stress' in data_ref['ground_state']:
-            return sn.sum(sn.abs(parsed_output['ground_state']['stress'][i][j] -
-                                 data_ref['ground_state']['stress'][i][j]) for i in [0, 1, 2] for j in [0, 1, 2])
-        else:
-            return sn.abs(0)
-
-    @sanity_function
-    def forces_diff(self, filename, data_ref):
-        ''' Return the difference between obtained and reference atomic forces'''
-        parsed_output = load_json(filename)
-        if 'forces' in parsed_output['ground_state'] and 'forces' in data_ref['ground_state']:
-            na = parsed_output['ground_state']['num_atoms'].evaluate()
-            return sn.sum(sn.abs(parsed_output['ground_state']['forces'][i][j] -
-                                 data_ref['ground_state']['forces'][i][j]) for i in range(na) for j in [0, 1, 2])
-        else:
-            return sn.abs(0)
-
-
     @run_after('init')
     def skip_if_null_image(self):
-        self.skip_if(self.container_image == 'NULL', 'no container image was given')
+        self.skip_if(self.container_image == 'NULL',
+                     'no container image was given')
 
     @run_after('init')
     def setup_test(self):
@@ -101,11 +49,78 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
     @run_before('run')
     def set_cpu_binding(self):
-         #self.job.launcher.options = ['--cpu-bind=cores', ' --hint=nomultithread']
-         #
         self.job.launcher.options = [' --hint=nomultithread']
         if self.current_system.name in {'hohgant'}:
             self.job.launcher.options += ['--mpi=pmi2']
+
+    @run_before('sanity')
+    def load_json_data(self):
+        with open(self.fout) as f:
+            try:
+                self.output_data = json.load(f)
+            except json.JSONDecodeError as e:
+                raise SanityError(
+                    f'failed to parse JSON file {self.fout}') from e
+
+        with open(self.data_ref) as f:
+            try:
+                self.reference_data = json.load(f)
+            except json.JSONDecodeError as e:
+                raise SanityError(
+                    f'failed to parse JSON file {self.data_ref}') from e
+
+
+    @deferrable
+    def energy_diff(self):
+        ''' Return the difference between obtained and reference total energies'''
+        return sn.abs(self.output_data['ground_state']['energy']['total'] -
+                      self.reference_data['ground_state']['energy']['total'])
+
+    @deferrable
+    def stress_diff(self):
+        ''' Return the difference between obtained and reference stress tensor components'''
+        if ('stress' in self.output_data['ground_state'] and
+            'stress' in self.reference_data['ground_state']):
+            return sn.sum(
+                sn.abs(parsed_output['ground_state']['stress'][i][j] -
+                       reference['ground_state']['stress'][i][j])
+                for i in [0, 1, 2] for j in [0, 1, 2]
+            )
+        else:
+            return sn.abs(0)
+
+    @deferrable
+    def forces_diff(self):
+        ''' Return the difference between obtained and reference atomic forces'''
+        if ('forces' in self.output_data['ground_state'] and
+            'forces' in self.reference_data['ground_state']):
+            na = self.output_data['ground_state']['num_atoms']
+            return sn.sum(
+                sn.abs(parsed_output['ground_state']['forces'][i][j] -
+                       data_ref['ground_state']['forces'][i][j])
+                for i in range(na) for j in [0, 1, 2]
+            )
+        else:
+            return sn.abs(0)
+
+    @sanity_function
+    def assert_success(self):
+        return sn.all([
+            sn.assert_found(r'converged after', self.stdout,
+                            msg="Calculation didn't converge"),
+            sn.assert_lt(self.energy_diff(), 1e-5,
+                         msg="Total energy is different"),
+            sn.assert_lt(self.stress_diff(), 1e-5,
+                         msg="Stress tensor is different"),
+            sn.assert_lt(self.forces_diff(), 1e-5,
+                         msg="Atomic forces are different")
+        ])
+
+
+@rfm.simple_test
+class sirius_scf_serial(sirius_scf_base_test):
+    tags = {'serial'}
+
 
 #@rfm.parameterized_test(*([test_folder] for test_folder in test_folders))
 #class sirius_scf_serial(sirius_scf_base_test):
