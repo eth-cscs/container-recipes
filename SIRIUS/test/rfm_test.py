@@ -7,43 +7,6 @@ import reframe.utility.sanity as sn
 
 test_folders = ['Si63Ge']
 
-@sanity_function
-def load_json(filename):
-    '''This will load a json data from a file.'''
-    raw_data = sn.extractsingle(r'(?s).+', filename).evaluate()
-    try:
-        return json.loads(raw_data)
-    except json.JSONDecodeError as e:
-        raise SanityError('failed to parse JSON file') from e
-
-@sanity_function
-def energy_diff(filename, data_ref):
-    ''' Return the difference between obtained and reference total energies'''
-    parsed_output = load_json(filename)
-    return sn.abs(parsed_output['ground_state']['energy']['total'] -
-                       data_ref['ground_state']['energy']['total'])
-
-@sanity_function
-def stress_diff(filename, data_ref):
-    ''' Return the difference between obtained and reference stress tensor components'''
-    parsed_output = load_json(filename)
-    if 'stress' in parsed_output['ground_state'] and 'stress' in data_ref['ground_state']:
-        return sn.sum(sn.abs(parsed_output['ground_state']['stress'][i][j] -
-                             data_ref['ground_state']['stress'][i][j]) for i in [0, 1, 2] for j in [0, 1, 2])
-    else:
-        return sn.abs(0)
-
-@sanity_function
-def forces_diff(filename, data_ref):
-    ''' Return the difference between obtained and reference atomic forces'''
-    parsed_output = load_json(filename)
-    if 'forces' in parsed_output['ground_state'] and 'forces' in data_ref['ground_state']:
-        na = parsed_output['ground_state']['num_atoms'].evaluate()
-        return sn.sum(sn.abs(parsed_output['ground_state']['forces'][i][j] -
-                             data_ref['ground_state']['forces'][i][j]) for i in range(na) for j in [0, 1, 2])
-    else:
-        return sn.abs(0)
-
 @rfm.simple_test
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     valid_systems = ['hohgant:gpu']
@@ -54,6 +17,43 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     executable_opts = ['--output=output.json']
     strict_check = False
     maintainers = ['antonk']
+
+    @sanity_function
+    def load_json(filename):
+        '''This will load a json data from a file.'''
+        raw_data = sn.extractsingle(r'(?s).+', filename).evaluate()
+        try:
+            return json.loads(raw_data)
+        except json.JSONDecodeError as e:
+            raise SanityError('failed to parse JSON file') from e
+
+    @sanity_function
+    def energy_diff(filename, data_ref):
+        ''' Return the difference between obtained and reference total energies'''
+        parsed_output = load_json(filename)
+        return sn.abs(parsed_output['ground_state']['energy']['total'] -
+                           data_ref['ground_state']['energy']['total'])
+
+    @sanity_function
+    def stress_diff(filename, data_ref):
+        ''' Return the difference between obtained and reference stress tensor components'''
+        parsed_output = load_json(filename)
+        if 'stress' in parsed_output['ground_state'] and 'stress' in data_ref['ground_state']:
+            return sn.sum(sn.abs(parsed_output['ground_state']['stress'][i][j] -
+                                 data_ref['ground_state']['stress'][i][j]) for i in [0, 1, 2] for j in [0, 1, 2])
+        else:
+            return sn.abs(0)
+
+    @sanity_function
+    def forces_diff(filename, data_ref):
+        ''' Return the difference between obtained and reference atomic forces'''
+        parsed_output = load_json(filename)
+        if 'forces' in parsed_output['ground_state'] and 'forces' in data_ref['ground_state']:
+            na = parsed_output['ground_state']['num_atoms'].evaluate()
+            return sn.sum(sn.abs(parsed_output['ground_state']['forces'][i][j] -
+                                 data_ref['ground_state']['forces'][i][j]) for i in range(na) for j in [0, 1, 2])
+        else:
+            return sn.abs(0)
 
     def __init__(self, num_ranks, test_folder):
         super().__init__()
