@@ -44,6 +44,7 @@ include:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_XTHOSTNAME=1
     - export RFM_REMOTE_DETECT=0
+    - export CUDA_VISIBLE_DEVICES="0,1,2,3"
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
