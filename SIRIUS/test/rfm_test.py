@@ -19,7 +19,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     maintainers = ['antonk']
 
     @sanity_function
-    def load_json(filename):
+    def load_json(self, filename):
         '''This will load a json data from a file.'''
         raw_data = sn.extractsingle(r'(?s).+', filename).evaluate()
         try:
@@ -28,14 +28,14 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
             raise SanityError('failed to parse JSON file') from e
 
     @sanity_function
-    def energy_diff(filename, data_ref):
+    def energy_diff(self, filename, data_ref):
         ''' Return the difference between obtained and reference total energies'''
         parsed_output = load_json(filename)
         return sn.abs(parsed_output['ground_state']['energy']['total'] -
                            data_ref['ground_state']['energy']['total'])
 
     @sanity_function
-    def stress_diff(filename, data_ref):
+    def stress_diff(self, filename, data_ref):
         ''' Return the difference between obtained and reference stress tensor components'''
         parsed_output = load_json(filename)
         if 'stress' in parsed_output['ground_state'] and 'stress' in data_ref['ground_state']:
@@ -45,7 +45,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
             return sn.abs(0)
 
     @sanity_function
-    def forces_diff(filename, data_ref):
+    def forces_diff(self, filename, data_ref):
         ''' Return the difference between obtained and reference atomic forces'''
         parsed_output = load_json(filename)
         if 'forces' in parsed_output['ground_state'] and 'forces' in data_ref['ground_state']:
