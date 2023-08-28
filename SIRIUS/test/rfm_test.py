@@ -7,6 +7,7 @@ import reframe.utility.sanity as sn
 
 test_folders = ['Si63Ge']
 
+@rfm.simple_test
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     valid_systems = ['hohgant:gpu']
     valid_prog_environs = ['builtin']
@@ -16,6 +17,19 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     executable_opts = ['--output=output.json']
     strict_check = False
     maintainers = ['antonk']
+
+    data_ref = load_json('output_ref.json')
+    fout = 'output.json'
+    num_tasks = 4
+
+    test_folder = parameter(['Si63Ge'])
+
+    sanity_patterns = sn.all([
+            sn.assert_found(r'converged after', self.stdout, msg="Calculation didn't converge"),
+            sn.assert_lt(energy_diff(fout, data_ref), 1e-5, msg="Total energy is different"),
+            #sn.assert_lt(stress_diff(fout, data_ref), 1e-5, msg="Stress tensor is different"),
+            #sn.assert_lt(forces_diff(fout, data_ref), 1e-5, msg="Atomic forces are different")
+        ])
 
     @sanity_function
     def load_json(self, filename):
@@ -54,23 +68,6 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
         else:
             return sn.abs(0)
 
-    def __init__(self, num_ranks, test_folder):
-        super().__init__()
-
-        self.num_tasks = num_ranks
-
-        self.sourcesdir = './' + test_folder
-
-        data_ref = load_json('output_ref.json')
-
-        fout = 'output.json'
-
-        self.sanity_patterns = sn.all([
-            sn.assert_found(r'converged after', self.stdout, msg="Calculation didn't converge"),
-            sn.assert_lt(energy_diff(fout, data_ref), 1e-5, msg="Total energy is different"),
-            #sn.assert_lt(stress_diff(fout, data_ref), 1e-5, msg="Stress tensor is different"),
-            #sn.assert_lt(forces_diff(fout, data_ref), 1e-5, msg="Atomic forces are different")
-        ])
 
     @run_after('init')
     def skip_if_null_image(self):
@@ -117,11 +114,11 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 #        self.tags = {'serial'}
 #
 #
-@rfm.parameterized_test(*([test_folder] for test_folder in test_folders))
-class sirius_scf_serial_parallel_k(sirius_scf_base_test):
-    def __init__(self, test_folder):
-        super().__init__(4, test_folder)
-        self.tags = {'parallel_k'}
+#@rfm.parameterized_test(*([test_folder] for test_folder in test_folders))
+#class sirius_scf_serial_parallel_k(sirius_scf_base_test):
+#    def __init__(self, test_folder):
+#        super().__init__(4, test_folder)
+#        self.tags = {'parallel_k'}
 
 
 #@rfm.parameterized_test(*([test_folder] for test_folder in test_folders))
