@@ -71,7 +71,6 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
                 raise SanityError(
                     f'failed to parse JSON file {self.data_ref}') from e
 
-
     @deferrable
     def energy_diff(self):
         ''' Return the difference between obtained and reference total energies'''
@@ -84,8 +83,8 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
         if ('stress' in self.output_data['ground_state'] and
             'stress' in self.reference_data['ground_state']):
             return sn.sum(
-                sn.abs(parsed_output['ground_state']['stress'][i][j] -
-                       reference['ground_state']['stress'][i][j])
+                sn.abs(self.output_data['ground_state']['stress'][i][j] -
+                       self.reference_data['ground_state']['stress'][i][j])
                 for i in [0, 1, 2] for j in [0, 1, 2]
             )
         else:
@@ -98,8 +97,8 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
             'forces' in self.reference_data['ground_state']):
             na = self.output_data['ground_state']['num_atoms']
             return sn.sum(
-                sn.abs(parsed_output['ground_state']['forces'][i][j] -
-                       data_ref['ground_state']['forces'][i][j])
+                sn.abs(self.output_data['ground_state']['forces'][i][j] -
+                       self.reference_data['ground_state']['forces'][i][j])
                 for i in range(na) for j in [0, 1, 2]
             )
         else:
