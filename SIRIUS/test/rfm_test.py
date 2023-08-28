@@ -7,7 +7,6 @@ import reframe.utility.sanity as sn
 
 test_folders = ['Si63Ge']
 
-@rfm.simple_test
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     valid_systems = ['hohgant:gpu']
     valid_prog_environs = ['builtin']
