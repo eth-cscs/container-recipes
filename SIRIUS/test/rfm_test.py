@@ -18,8 +18,6 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     fout = 'output.json'
     num_tasks = 4
 
-    sourcesdir = './' + test_folder
-
     @run_after('init')
     def skip_if_null_image(self):
         self.skip_if(self.container_image == 'NULL',
@@ -41,6 +39,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
             self.env_vars = {
                 'OMP_NUM_THREADS': str(self.num_cpus_per_task)
             }
+        self.sourcesdir = './' + self.test_folder
 
     @run_after('setup')
     def setup_container_platform(self):
