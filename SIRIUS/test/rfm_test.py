@@ -39,6 +39,9 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
             self.env_vars = {
                 'OMP_NUM_THREADS': str(self.num_cpus_per_task)
             }
+
+    @run_after('setup')
+    def set_test_dir(self):
         self.sourcesdir = './' + self.test_folder
 
     @run_after('setup')
