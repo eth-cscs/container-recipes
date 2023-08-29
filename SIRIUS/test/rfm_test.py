@@ -126,7 +126,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
 
 @rfm.simple_test
-class sirius_scf_serial(sirius_scf_base_test):
+class sirius_scf_test(sirius_scf_base_test):
     tags = {'parallel_k'}
     def __init__(self):
         super().__init__(4)
