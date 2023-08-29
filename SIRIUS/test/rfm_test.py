@@ -7,7 +7,7 @@ import reframe.utility.sanity as sn
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     test_folder = parameter(['Si63Ge'])
     container_image = variable(str, value='NULL')
-    valid_systems = ['hohgant:gpu']
+    valid_systems = ['hohgant:nvgpu']
     valid_prog_environs = ['builtin']
     container_platform = 'Sarus'
     executable = 'sirius.scf'
@@ -42,7 +42,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
     @run_after('setup')
     def set_test_dir(self):
-        self.sourcesdir = './SIRIUS/test' + self.test_folder
+        self.sourcesdir = self.test_folder
 
     @run_after('setup')
     def setup_container_platform(self):
