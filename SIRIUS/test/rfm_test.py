@@ -2,6 +2,7 @@ import json
 
 import reframe as rfm
 import reframe.utility.sanity as sn
+import reframe.utility.osext as osext
 
 
 class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
@@ -60,19 +61,20 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
     @run_before('sanity')
     def load_json_data(self):
-        with open(self.fout) as f:
-            try:
-                self.output_data = json.load(f)
-            except json.JSONDecodeError as e:
-                raise SanityError(
-                    f'failed to parse JSON file {self.fout}') from e
+        with osext.change_dir(self.stagedir):
+            with open(self.fout) as f:
+                try:
+                    self.output_data = json.load(f)
+                except json.JSONDecodeError as e:
+                    raise SanityError(
+                        f'failed to parse JSON file {self.fout}') from e
 
-        with open(self.data_ref) as f:
-            try:
-                self.reference_data = json.load(f)
-            except json.JSONDecodeError as e:
-                raise SanityError(
-                    f'failed to parse JSON file {self.data_ref}') from e
+            with open(self.data_ref) as f:
+                try:
+                    self.reference_data = json.load(f)
+                except json.JSONDecodeError as e:
+                    raise SanityError(
+                        f'failed to parse JSON file {self.data_ref}') from e
 
     @deferrable
     def energy_diff(self):
