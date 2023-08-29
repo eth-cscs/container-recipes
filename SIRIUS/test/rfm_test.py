@@ -42,7 +42,7 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
     @run_after('setup')
     def set_test_dir(self):
-        self.sourcesdir = './' + self.test_folder
+        self.sourcesdir = './SIRIUS/test' + self.test_folder
 
     @run_after('setup')
     def setup_container_platform(self):
