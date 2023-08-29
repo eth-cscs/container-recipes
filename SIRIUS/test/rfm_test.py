@@ -12,12 +12,14 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
     valid_prog_environs = ['builtin']
     container_platform = 'Sarus'
     executable = 'sirius.scf'
-    executable_opts = ['--output=output.json']
     strict_check = False
     maintainers = ['antonk']
     data_ref = 'output_ref.json'
     fout = 'output.json'
-    num_tasks = 4
+
+    def __init__(self, num_tasks):
+        self.num_tasks = num_tasks
+        self.executable_opts = ['--output=output.json']
 
     @run_after('init')
     def skip_if_null_image(self):
@@ -125,7 +127,9 @@ class sirius_scf_base_test(rfm.RunOnlyRegressionTest):
 
 @rfm.simple_test
 class sirius_scf_serial(sirius_scf_base_test):
-    tags = {'serial'}
+    tags = {'parallel_k'}
+    def __init__(self);
+        super().__init__(4)
 
 
 #@rfm.parameterized_test(*([test_folder] for test_folder in test_folders))
