@@ -42,6 +42,7 @@ test sirius-develop hohgant a100 reframe:
   extends: .run-reframe-test
   needs: ["build sirius-develop a100"]
   variables:
+    CUDA_VISIBLE_DEVICES: "0,1,2,3"
     REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c SIRIUS/test/rfm_test.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
 
 #run sirius develop hohgant cpu mpi-hook:
