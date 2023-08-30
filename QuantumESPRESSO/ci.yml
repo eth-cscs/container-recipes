@@ -63,12 +63,12 @@ build gcc qe72 image:
 .test-image-cpu:
   extends: .run-reframe-test
   variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
 
-.test-image-a100:
-  extends: .run-reframe-test
-  variables:
-    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
+    #.test-image-a100:
+    #  extends: .run-reframe-test
+    #  variables:
+    #    REFRAME_COMMAND: 'reframe -S qe_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
 
     # not working at the moment
     #test nvhpc cpu qe71 image hohgant:
