@@ -44,7 +44,6 @@ include:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_XTHOSTNAME=1
     - export RFM_REMOTE_DETECT=0
-      #    - export CUDA_VISIBLE_DEVICES="0,1,2,3"
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
@@ -58,7 +57,7 @@ include:
 
 # template to run tests on hohgant cpu partition
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-cpu:
+.run-hohgant-cpu:
   extends: .container-runner-hohgant-zen2
   stage: run
   variables:
@@ -74,7 +73,7 @@ include:
 
 # template to run tests on hohgant nvidia gpu partition
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-a100:
+.run-hohgant-a100:
   extends: .container-runner-hohgant-a100
   stage: run
   variables:
@@ -90,7 +89,7 @@ include:
 
 # template to run tests on hohgant maintenance node
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-maint:
+.run-hohgant-maint:
   extends: .container-runner-hohgant
   stage: run
   variables:
@@ -105,7 +104,7 @@ include:
     SLURM_JOB_NODELIST: nid002536
   image: $BASE_IMAGE
 
-.deploy-image-jfrog:
+.deploy-image:
   extends: .container-builder
   stage: deploy
   variables:
