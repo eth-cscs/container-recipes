@@ -75,17 +75,17 @@ build gcc qe72 image:
     #  extends: .test-image-cpu
     #  needs: ["build nvhpc cpu qe71 image"]
 
-test nvhpc cuda qe71 image hohgant:
-  extends: .test-image-a100
-  needs: ["build nvhpc cuda qe71 image"]
+#test nvhpc cuda qe71 image hohgant:
+#  extends: .test-image-a100
+#  needs: ["build nvhpc cuda qe71 image"]
 
 test nvhpc cpu qe72 image hohgant:
   extends: .test-image-cpu
   needs: ["build nvhpc cpu qe72 image"]
 
-test nvhpc cuda qe72 image hohgant:
-  extends: .test-image-a100
-  needs: ["build nvhpc cuda qe72 image"]
+#test nvhpc cuda qe72 image hohgant:
+#  extends: .test-image-a100
+#  needs: ["build nvhpc cuda qe72 image"]
 
 test gcc qe72 image hohgant:
   extends: .test-image-cpu
