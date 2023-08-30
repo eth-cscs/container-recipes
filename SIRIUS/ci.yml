@@ -15,7 +15,7 @@ build sirius-develop a100:
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
 
 test sirius-develop hohgant cpu:
-  extends: .run-test-hohgant-cpu
+  extends: .run-hohgant-cpu
   needs: ["build sirius-develop cpu"]
   variables:
     SLURM_JOB_NUM_NODES: 1
@@ -27,7 +27,7 @@ test sirius-develop hohgant cpu:
     - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
 
 test sirius-develop hohgant a100:
-  extends: .run-test-hohgant-a100
+  extends: .run-hohgant-a100
   needs: ["build sirius-develop a100"]
   variables:
     SLURM_JOB_NUM_NODES: 1
@@ -45,7 +45,7 @@ test sirius-develop hohgant a100 reframe:
     REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c SIRIUS/test/rfm_test.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
 
 #run sirius develop hohgant cpu mpi-hook:
-#  extends: .run-test-hohgant-cpu
+#  extends: .run-hohgant-cpu
 #  needs: ["build sirius-develop image"]
 #  variables:
 #    USE_MPI: 'YES'
@@ -58,7 +58,7 @@ test sirius-develop hohgant a100 reframe:
 #    - /opt/sirius-cpu/bin/sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
 #
 #run sirius develop hohgant r1 a100:
-#  extends: .run-test-hohgant-a100
+#  extends: .run-hohgant-a100
 #  needs: ["build sirius-develop image"]
 #  variables:
 #    SLURM_JOB_NUM_NODES: 1
@@ -70,7 +70,7 @@ test sirius-develop hohgant a100 reframe:
 #    - /opt/sirius-gpu/bin/sirius.scf
 #
 #run sirius develop hohgant a100:
-#  extends: .run-test-hohgant-a100
+#  extends: .run-hohgant-a100
 #  needs: ["build sirius-develop image"]
 #  variables:
 #    SLURM_JOB_NUM_NODES: 1
@@ -82,7 +82,7 @@ test sirius-develop hohgant a100 reframe:
 #    - /opt/sirius-gpu/bin/sirius.scf --test_against=output_ref.json
 #
 #run sirius develop hohgant a100 mpi-hook:
-#  extends: .run-test-hohgant-a100
+#  extends: .run-hohgant-a100
 #  needs: ["build sirius-develop image"]
 #  variables:
 #    USE_MPI: 'YES'
@@ -96,7 +96,7 @@ test sirius-develop hohgant a100 reframe:
 #
 #
 #      #run sirius develop hohgant hwmaint cpu:
-#      #  extends: .run-test-hohgant-maint
+#      #  extends: .run-hohgant-maint
 #      #  needs: ["build sirius-develop image"]
 #      #  variables:
 #      #    USE_MPI: 'NO'
@@ -110,7 +110,7 @@ test sirius-develop hohgant a100 reframe:
 #      #    - $TEST_COMMAND
 #
 #      #run sirius develop hohgant hwmaint cpu mpi-hook:
-#      #  extends: .run-test-hohgant-maint
+#      #  extends: .run-hohgant-maint
 #      #  needs: ["build sirius-develop image"]
 #      #  variables:
 #      #    USE_MPI: 'YES'
