@@ -38,6 +38,12 @@ test sirius-develop hohgant a100:
     - cd SIRIUS/test/Si63Ge
     - sirius.scf --control.std_evp_solver_name=cusolver --control.gen_evp_solver_name=cusolver --test_against=output_ref.json
 
+test sirius-develop hohgant a100 reframe:
+  extends: .run-reframe-test
+  needs: ["build sirius-develop a100"]
+  variables:
+    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c SIRIUS/test/rfm_test.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
+
 #run sirius develop hohgant cpu mpi-hook:
 #  extends: .run-test-hohgant-cpu
 #  needs: ["build sirius-develop image"]
