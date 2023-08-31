@@ -52,13 +52,13 @@ build qe72 gcc:
 .test-image-cpu:
   extends: .run-reframe-test
   variables:
-    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
 
 .test-image-a100:
   extends: .run-reframe-test
   variables:
     CUDA_VISIBLE_DEVICES: "0,1,2,3"
-    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
+    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
 
 #
 # test images
