@@ -38,7 +38,7 @@ include:
     - !reference [.fetch-registry-tokens, script]
     - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
     - rm -rf cscs-reframe-tests
-    - git clone -b apps/qe https://github.com/eth-cscs/cscs-reframe-tests.git
+    - git clone -b check-qe-uenv https://github.com/eth-cscs/cscs-reframe-tests.git
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
     - pip install reframe-hpc
