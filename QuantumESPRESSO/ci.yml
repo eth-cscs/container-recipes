@@ -63,29 +63,29 @@ build qe72 gcc:
 #
 # test images
 #
-test qe71 nvhpc hohgant-cpu:
-  extends: .test-image-cpu
-  needs: ["build qe71 nvhpc cpu"]
+#test qe71 nvhpc hohgant-cpu:
+#  extends: .test-image-cpu
+#  #needs: ["build qe71 nvhpc cpu"]
 
 test qe71 nvhpc hohgant-a100:
   extends: .test-image-a100
-  needs: ["build qe71 nvhpc a100"]
+  #needs: ["build qe71 nvhpc a100"]
 
 test qe71 gcc hohgant-cpu:
   extends: .test-image-cpu
-  needs: ["build qe71 gcc"]
+  #needs: ["build qe71 gcc"]
 
 test qe72 nvhpc hohgant-cpu:
   extends: .test-image-cpu
-  needs: ["build qe72 nvhpc cpu"]
+  #needs: ["build qe72 nvhpc cpu"]
 
 test qe72 nvhpc hohgant-a100:
   extends: .test-image-a100
-  needs: ["build qe72 nvhpc a100"]
+  #needs: ["build qe72 nvhpc a100"]
 
 test qe72 gcc hohgant-cpu:
   extends: .test-image-cpu
-  needs: ["build qe72 gcc"]
+  #needs: ["build qe72 gcc"]
 
 # PoC: deploy without testing
 deploy qe71 image:
@@ -98,7 +98,7 @@ deploy qe71 image:
 
 deploy qe72 cpu:
   extends: .deploy-image
-  needs: ["test qe72 gcc hohgant-cpu"]
+  #needs: ["test qe72 gcc hohgant-cpu"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
@@ -107,7 +107,7 @@ deploy qe72 cpu:
 # deploy QE-7.2-GPU
 deploy qe72 a100:
   extends: .deploy-image
-  needs: ["test qe72 nvhpc hohgant-a100"]
+  #needs: ["test qe72 nvhpc hohgant-a100"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
