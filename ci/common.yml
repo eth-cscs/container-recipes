@@ -50,8 +50,8 @@ include:
     when: always
     paths:
       - report.xml
-      - stage/**/*.out
-      - stage/**/*.err
+      - $CI_BUILDS_DIR/stage/**/*.out
+      - $CI_BUILDS_DIR/stage/**/*.err
     reports:
       junit: report.xml
 
