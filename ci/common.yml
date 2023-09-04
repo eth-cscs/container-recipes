@@ -42,7 +42,7 @@ include:
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
     - pip install reframe-hpc
-    - export RFM_AUTODETECT_XTHOSTNAME=1
+    - export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
     - export RFM_REMOTE_DETECT=0
     - ${REFRAME_COMMAND}
     - deactivate
