@@ -57,6 +57,17 @@ include:
     reports:
       junit: report.xml
 
+.run-reframe-test-cpu:
+  extends: .run-reframe-test
+  variables:
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml ${REFRAME_ARGS}'
+
+.run-reframe-test-a100:
+  extends: .run-reframe-test
+  variables:
+    CUDA_VISIBLE_DEVICES: "0,1,2,3"
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml ${REFRAME_ARGS}'
+
 # template to run tests on hohgant cpu partition
 # BASE_IMAGE variable must be provided
 .run-hohgant-cpu:
@@ -111,7 +122,7 @@ include:
   stage: deploy
   variables:
     DOCKERFILE: ci/deploy.Dockerfile
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION_TAG
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION
     DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
 
 stages:

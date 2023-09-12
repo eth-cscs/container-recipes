@@ -49,16 +49,8 @@ build qe72 gcc:
 #    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
-.test-image-cpu:
-  extends: .run-reframe-test
-  variables:
-    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:cpu --report-junit=report.xml -r'
-
-.test-image-a100:
-  extends: .run-reframe-test
-  variables:
-    CUDA_VISIBLE_DEVICES: "0,1,2,3"
-    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py --system=hohgant:nvgpu --skip-performance-check --report-junit=report.xml -r'
+variables:
+  REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py -r'
 
 #
 # test images
@@ -68,24 +60,19 @@ build qe72 gcc:
 #  #needs: ["build qe71 nvhpc cpu"]
 
 test qe71 nvhpc hohgant-a100:
-  extends: .test-image-a100
-  #needs: ["build qe71 nvhpc a100"]
+  extends: .run-reframe-test-a100
 
 test qe71 gcc hohgant-cpu:
-  extends: .test-image-cpu
-  #needs: ["build qe71 gcc"]
+  extends: .run-reframe-test-cpu
 
 test qe72 nvhpc hohgant-cpu:
-  extends: .test-image-cpu
-  #needs: ["build qe72 nvhpc cpu"]
+  extends: .run-reframe-test-cpu
 
 test qe72 nvhpc hohgant-a100:
-  extends: .test-image-a100
-  #needs: ["build qe72 nvhpc a100"]
+  extends: .run-reframe-test-a100
 
 test qe72 gcc hohgant-cpu:
-  extends: .test-image-cpu
-  #needs: ["build qe72 gcc"]
+  extends: .run-reframe-test-cpu
 
 # PoC: deploy without testing
 deploy qe71 image:
@@ -94,21 +81,19 @@ deploy qe71 image:
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
-    VERSION_TAG: '7.1'
+    VERSION: '7.1'
 
 deploy qe72 cpu:
   extends: .deploy-image
-  #needs: ["test qe72 gcc hohgant-cpu"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
-    VERSION_TAG: '7.2'
+    VERSION: '7.2'
 
 # deploy QE-7.2-GPU
 deploy qe72 a100:
   extends: .deploy-image
-  #needs: ["test qe72 nvhpc hohgant-a100"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
-    VERSION_TAG: '7.2'
+    VERSION: '7.2'
