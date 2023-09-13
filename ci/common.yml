@@ -30,7 +30,7 @@ include:
 
 # template to run reframe tests
 .run-reframe-test:
-  stage: run
+  stage: test
   tags: ['hohgant-login-baremetal']
   variables:
     GIT_STRATEGY: fetch
@@ -72,7 +72,7 @@ include:
 # BASE_IMAGE variable must be provided
 .run-hohgant-cpu:
   extends: .container-runner-hohgant-zen2
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -88,7 +88,7 @@ include:
 # BASE_IMAGE variable must be provided
 .run-hohgant-a100:
   extends: .container-runner-hohgant-a100
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -104,7 +104,7 @@ include:
 # BASE_IMAGE variable must be provided
 .run-hohgant-maint:
   extends: .container-runner-hohgant
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -127,5 +127,5 @@ include:
 
 stages:
   - build
-  - run
+  - test
   - deploy

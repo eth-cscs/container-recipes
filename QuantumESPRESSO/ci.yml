@@ -43,39 +43,51 @@ build qe72 gcc:
     DOCKERFILE: QuantumESPRESSO/gcc/cpu/Dockerfile
     DOCKER_BUILD_ARGS: '["QE_VERSION=qe-7.2"]'
 
+
 #build qe-develop image:
 #  extends: .build-image
 #  variables:
 #    DOCKERFILE: QuantumESPRESSO/nvhpc/Dockerfile
 #    DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=develop"]'
 
+#
+# ReFrame command is the same for CPU and GPU tests, so make it a global variable here and pass to
+#  .run-reframe-test-cpu and .run-reframe-test-a100 templates
+#
 variables:
   REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/uenv_checks/apps/quantumespresso/quantumespresso_check_v2.py -r'
 
 #
 # test images
 #
-#test qe71 nvhpc hohgant-cpu:
-#  extends: .test-image-cpu
-#  #needs: ["build qe71 nvhpc cpu"]
+test qe71 nvhpc cpu:
+  extends: .run-reframe-test-cpu
+  needs: ["build qe71 nvhpc cpu"]
 
-test qe71 nvhpc hohgant-a100:
+test qe71 nvhpc a100:
+  needs: ["build qe71 nvhpc a100"]
   extends: .run-reframe-test-a100
 
-test qe71 gcc hohgant-cpu:
+test qe71 gcc:
+  needs: ["build qe71 gcc"]
   extends: .run-reframe-test-cpu
 
-test qe72 nvhpc hohgant-cpu:
+test qe72 nvhpc cpu:
   extends: .run-reframe-test-cpu
+  needs: ["build qe72 nvhpc cpu"]
 
-test qe72 nvhpc hohgant-a100:
+test qe72 nvhpc a100:
+  needs: ["build qe72 nvhpc a100"]
   extends: .run-reframe-test-a100
 
-test qe72 gcc hohgant-cpu:
+test qe72 gcc:
+  needs: ["build qe72 gcc"]
   extends: .run-reframe-test-cpu
 
+#
 # PoC: deploy without testing
-deploy qe71 image:
+#
+deploy qe71 gpu:
   extends: .deploy-image
   needs: ["build qe71 nvhpc a100"]
   variables:
@@ -85,14 +97,16 @@ deploy qe71 image:
 
 deploy qe72 cpu:
   extends: .deploy-image
+  needs: ["test qe72 nvhpc cpu"]
   variables:
     APP: 'quantumespresso'
-    ARCH: 'a100'
+    ARCH: 'zen2'
     VERSION: '7.2'
 
 # deploy QE-7.2-GPU
 deploy qe72 a100:
   extends: .deploy-image
+  needs: ["test qe72 nvhpc gpu"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
