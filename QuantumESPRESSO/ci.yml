@@ -87,7 +87,7 @@ test qe72 gcc:
 #
 # PoC: deploy without testing
 #
-deploy qe71 gpu:
+deploy qe71 a100:
   extends: .deploy-image
   needs: ["build qe71 nvhpc a100"]
   variables:
@@ -106,7 +106,7 @@ deploy qe72 cpu:
 # deploy QE-7.2-GPU
 deploy qe72 a100:
   extends: .deploy-image
-  needs: ["test qe72 nvhpc gpu"]
+  needs: ["test qe72 nvhpc a100"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
