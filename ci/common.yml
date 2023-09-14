@@ -123,6 +123,7 @@ include:
   variables:
     DOCKERFILE: ci/deploy.Dockerfile
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION
+    CSCS_REBUILD_POLICY: always
     DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
 
 stages:
