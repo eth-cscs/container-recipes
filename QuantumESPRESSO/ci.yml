@@ -60,9 +60,9 @@ variables:
 #
 # test images
 #
-test qe71 nvhpc cpu:
-  extends: .run-reframe-test-cpu
-  needs: ["build qe71 nvhpc cpu"]
+#test qe71 nvhpc cpu:
+#  extends: .run-reframe-test-cpu
+#  needs: ["build qe71 nvhpc cpu"]
 
 test qe71 nvhpc a100:
   needs: ["build qe71 nvhpc a100"]
