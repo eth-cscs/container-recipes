@@ -97,7 +97,7 @@ deploy qe71 a100:
 
 deploy qe72 cpu:
   extends: .deploy-image
-  needs: ["test qe72 nvhpc cpu"]
+  needs: ["build qe72 nvhpc cpu", "test qe72 nvhpc cpu"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'zen2'
@@ -106,7 +106,7 @@ deploy qe72 cpu:
 # deploy QE-7.2-GPU
 deploy qe72 a100:
   extends: .deploy-image
-  needs: ["test qe72 nvhpc a100"]
+  needs: ["build qe72 nvhpc a100", "test qe72 nvhpc a100"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'a100'
