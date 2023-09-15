@@ -55,7 +55,7 @@ build qe72 gcc:
 #  .run-reframe-test-cpu and .run-reframe-test-a100 templates
 #
 variables:
-  REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/checks/apps/quantumespresso/quantumespresso_check.py -r'
+  REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/checks/apps/quantumespresso/ -r'
 
 #
 # test images
