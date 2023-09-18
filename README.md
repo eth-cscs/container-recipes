@@ -10,10 +10,10 @@ This repository is registered at CSCS CI/CD service and is using build farm infr
 ```yml
 stages:
   - build
-  - run
+  - test
   - deploy
 ```
-and each stage can define multiple jobs that GitLab runner will execute. The pipeline is triggered by the pull-request to the `main` branch of repository (1). Then CI/CD middleware triggers the rebuild of all changed Dockerfiles on the build farm (2). In case of success build farm stores the resulting container in the temporaty location inside CSCS container registry (3). After that the optinal `run` stage is executed on the HPC platform to test the container (4) and finally the container is pushed to a persistent location in the container registry. Please have a look at [CI/CD template file](ci/common.yml) for the definition of basic templates for each of the stages.
+and each stage can define multiple jobs that GitLab runner will execute. The pipeline is triggered by the pull-request to the `main` branch of repository (1). Then CI/CD middleware triggers the rebuild of all changed Dockerfiles on the build farm (2). In case of success build farm stores the resulting container in the temporaty location inside CSCS container registry (3). After that the optinal `test` stage is executed on the HPC platform to test the container (4) and finally the container is pushed to a persistent location in the container registry. Please have a look at [CI/CD template file](ci/common.yml) for the definition of basic templates for each of the stages.
 
 | :exclamation:  Important: at the moment build farm runs on AMD zen2 architecture |
 |-|
@@ -42,7 +42,7 @@ deploy my image:
   variables:
     APP: 'myappname'
     ARCH: 'a100'
-    VERSION_TAG: '1.0'
+    VERSION: '1.0'
 ```
 
 with the the following directory structure for `myapp`: 
@@ -58,20 +58,24 @@ container-recipes/
 ## Comments
 The example pipeline above uses two stages - `build my image` and `deploy my image`. You can avoid deployment stage, but then your container will be stored in a temporary location in CSCS container registry and cleaned up at any time without notice. More information about variables used in each stage is available in the [next section](#writing-your-ciyml-file). 
 
-If the build stage is successful, the final image is pushed to  `$CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION_TAG`. At the moment `CSCS_REGISTRY` variable points to https://jfrog.svc.cscs.ch/artifactory.
+If the build stage is successful, the final image is pushed to  `$CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION`. At the moment `CSCS_REGISTRY` variable points to https://jfrog.svc.cscs.ch/artifactory.
 
 Run `sarus pull https://jfrog.svc.cscs.ch/artifactory/contbuild/apps/public/a100/myappname:1.0` from the compute or login node to pull the example image to your local working directory.
 
 # Writing your ci.yml file
-We use GitLab runner to defined and execute the logic of the pipelines. The full documentation for GitLab ci.yml keywords is available [here](https://docs.gitlab.com/ee/ci/yaml/). Our [CI/CD template file](ci/common.yml) defines the following templates to build, test and deploy images.
+We use GitLab runner to defined and execute logic of the pipelines. The full documentation for GitLab `ci.yml` keywords is available [here](https://docs.gitlab.com/ee/ci/yaml/). On top of it [CSCS middlware](https://gitlab.com/cscs-ci/ci-testing/containerised_ci_doc) defines several variables to configure slurm and container engine runners. On top of both our [CI/CD template file](ci/common.yml) defines the following templates to build, test and deploy images.
 
 ### .build-image
-Template for building images.
-* stage: build
-* variables:
-  - DOCKERFILE - name of the Dockerfile
-  - DOCKER_BUILD_ARGS - (optional) list of the docker build arguments passed to `docker build` command via `--build-arg` argument
-
+Template for building images. Main variables:
+```yaml
+stage: build
+variables:
+  # name of the Dockerfile
+  - DOCKERFILE: string
+  # (optional) list of arguments passed to `docker build`
+  # command via `--build-arg` argument
+  - DOCKER_BUILD_ARGS: string of the parameters list, for example '["VAR=value"]'
+```
 Example:
 ```yml
 build nvhpc cuda qe71 image:
@@ -81,45 +85,49 @@ build nvhpc cuda qe71 image:
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80", "QE_VERSION=qe-7.1"]'
 ```
 
-### .run-reframe-test
-Template for running ReFrame tests.
-* stage: run
-* variables:
-  - REFRAME_COMMAND - full ReFrame command to run a test of containerized application. ReFrame command will be executed from the root folder of the repository (from `./container-recipes`).
+### .run-reframe-test-cpu, .run-reframe-test-100
+Templates for running ReFrame tests on cpu or a100 architectures. Reframe templates do not take any arguments, however a global variable `REFRAME_ARGS` that defines ReFrame arguments to pass container image name and name of the test must be defined. For example:
+```yaml
+# global variable definition
+variables:
+  REFRAME_ARGS: '-S myapp_image="$BASE_IMAGE" -c cscs-reframe-tests/checks/apps/myapp/myapp_check.py'
+```
 
-Use `-S my_image_name_var="$BASE_IMAGE"` argment of ReFrame to set `my_image_name_var` variable of the test to point to the container URL. Inside Python test the following line will be relevant
+Then the ReFrame test stage is defined simply as:
+```yaml
+test myapp a100:
+  needs: ["build my image"]
+  extends: .run-reframe-test-a100
+```
+ReFrame command will be executed by a gitlab runner from the root folder of the repository (from `./container-recipes`). Inside Python test the following line will be relevant
 ```Python
-my_image_name_var = variable(str, value='NULL')
-```
-Example:
-```yml
-test-image-cpu:
-  extends: .run-reframe-test
-  variables:
-    REFRAME_COMMAND: 'reframe -S container_image="$BASE_IMAGE" -C cscs-reframe-tests/config/cscs.py -c QuantumESPRESSO/rfm_test/qe_check.py --system=hohgant:cpu --skip-performance-check --report-junit=report.xml -r'
+myapp_image = variable(str, value='NULL')
 ```
 
-| :warning:  Waring: this part of documentation is subjected to change|
-|---------------------------------------------------------------------|
-
-### .run-test-hohgant-cpu
-* Template for running Slurm CPU jobs on TDS cluster  
-* stage: run
-* variables:
-  - USE_MPI: - ('YES'/'NO') use MPI hook to inject Cray's optimised mpich library into container
-  - SLURM_JOB_NUM_NODES - number of nodes for the slurm job
-  - SLURM_CPUS_PER_TASK - number of CPU cores per MPI rank
-  - SLURM_NTASKS - total number of MPI ranks
-* script:
+### .run-test-hohgant-cpu, .run-test-hohgant-a100
+Template for running Slurm jobs on a cpu or a100 partition of a TDS cluster. Main variables:  
+```yaml
+stage: run
+variables:
+  # ('YES'/'NO') use MPI hook to inject Cray's optimised mpich library into container
+  - USE_MPI: string
+  # number of nodes for the slurm job (-N argument of srun)
+  - SLURM_JOB_NUM_NODES: integer
+  # number of CPU cores per MPI rank (-c argument of srun)
+  - SLURM_CPUS_PER_TASK: integer
+  # total number of MPI ranks (-b argument of srun)
+  - SLURM_NTASKS: integer
+# a set of commands that will be executed inside sbatch submission script
+script:
   - command1
   - command2
   - ...
-
-Section `script` defines the list of commands that will be executed in a batch submission script. Execution starts from the root folder of the project. Example:
+```
+Execution starts from the root folder of the project. Example:
 ```yaml
-run sirius develop hohgant cpu mpi-hook:
- extends: .run-test-hohgant-cpu
-  needs: ["build sirius-develop image"]
+run myapp cpu:
+  extends: .run-test-hohgant-cpu
+  needs: ["build myapp"]
   variables:
     USE_MPI: 'YES'
     SLURM_JOB_NUM_NODES: 1
@@ -127,27 +135,29 @@ run sirius develop hohgant cpu mpi-hook:
     OMP_NUM_THREADS: $SLURM_CPUS_PER_TASK
     SLURM_NTASKS: 16
   script:
-    - cd SIRIUS/test/Si63Ge
-    - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
+    - cd myapp/test
+    # run myapp inside container on 16 MPI ranks with 8 threads/rank
+    - /path/to/myapp [optinal arguments]
 ```
 
-### .run-test-hohgant-gpu
-Same as before but for the GPU partition.
-
 ### .deploy-image-jfrog
-Deploy image at persistent location in container registry.
-* stage: deploy
-* variables: 
-  - APP - name of the application (no capitals and no special symbols)
-  - ARCH - container's target architecture (can be one of a00, zen2, zen3)
-  - VERSION_TAG: version of the application
-
+Deploy image at persistent location in container registry. Main variables:
+```yaml
+stage: deploy
+variables: 
+  # name of the application (no capitals and no special symbols)
+  - APP: string
+  # container's target architecture (can be one of a100, zen2, zen3)
+  - ARCH: string
+  # version of the application
+  - VERSION: string
+```
 Example:
 ```yaml
-deploy qe72 image:
+deploy myapp:
   extends: .deploy-image-jfrog
   variables:
-    APP: 'quantumespresso'
+    APP: 'myapp'
     ARCH: 'a100'
-    VERSION_TAG: '7.2'
+    VERSION: '1.0'
 ```
