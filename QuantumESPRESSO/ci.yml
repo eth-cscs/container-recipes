@@ -72,9 +72,9 @@ test qe71 gcc:
   needs: ["build qe71 gcc"]
   extends: .run-reframe-test-cpu
 
-test qe72 nvhpc cpu:
-  extends: .run-reframe-test-cpu
-  needs: ["build qe72 nvhpc cpu"]
+  #test qe72 nvhpc cpu:
+  #  extends: .run-reframe-test-cpu
+  #  needs: ["build qe72 nvhpc cpu"]
 
 test qe72 nvhpc a100:
   needs: ["build qe72 nvhpc a100"]
@@ -97,7 +97,7 @@ deploy qe71 a100:
 
 deploy qe72 cpu:
   extends: .deploy-image
-  needs: ["build qe72 nvhpc cpu", "test qe72 nvhpc cpu"]
+  needs: ["build qe72 gcc", "test qe72 gcc"]
   variables:
     APP: 'quantumespresso'
     ARCH: 'zen2'
