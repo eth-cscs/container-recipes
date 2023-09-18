@@ -13,7 +13,7 @@ stages:
   - test
   - deploy
 ```
-and each stage can define multiple jobs that GitLab runner will execute. The pipeline is triggered by the pull-request to the `main` branch of repository (1). Then CI/CD middleware triggers the rebuild of all changed Dockerfiles on the build farm (2). In case of success build farm stores the resulting container in the temporaty location inside CSCS container registry (3). After that the optinal `test` stage is executed on the HPC platform to test the container (4) and finally the container is pushed to a persistent location in the container registry. Please have a look at [CI/CD template file](ci/common.yml) for the definition of basic templates for each of the stages.
+and each stage can define multiple jobs that GitLab runner will execute. The pipeline is triggered by the pull-request to the `main` branch of repository (1). Then CI/CD middleware triggers the rebuild of all changed Dockerfiles on the build farm (2). In case of success build farm stores the resulting container in the temporary location inside CSCS container registry (3). After that the optional `test` stage is executed on the HPC platform to test the container (4) and finally the container is pushed to a persistent location in the container registry. Please have a look at [CI/CD template file](ci/common.yml) for the definition of basic templates for each of the stages.
 
 | :exclamation:  Important: at the moment build farm runs on AMD zen2 architecture |
 |-|
@@ -60,10 +60,10 @@ The example pipeline above uses two stages - `build my image` and `deploy my ima
 
 If the build stage is successful, the final image is pushed to  `$CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION`. At the moment `CSCS_REGISTRY` variable points to https://jfrog.svc.cscs.ch/artifactory.
 
-Run `sarus pull https://jfrog.svc.cscs.ch/artifactory/contbuild/apps/public/a100/myappname:1.0` from the compute or login node to pull the example image to your local working directory.
+Run `sarus pull https://jfrog.svc.cscs.ch/artifactory/contbuild/apps/public/a100/myappname:1.0` from the compute or login node to pull application's image to your local working directory.
 
 # Writing your ci.yml file
-We use GitLab runner to defined and execute logic of the pipelines. The full documentation for GitLab `ci.yml` keywords is available [here](https://docs.gitlab.com/ee/ci/yaml/). On top of it [CSCS middlware](https://gitlab.com/cscs-ci/ci-testing/containerised_ci_doc) defines several variables to configure slurm and container engine runners. On top of both our [CI/CD template file](ci/common.yml) defines the following templates to build, test and deploy images.
+We use GitLab runner to define and execute logic of the pipelines. The full documentation for GitLab `ci.yml` keywords is available [here](https://docs.gitlab.com/ee/ci/yaml/). On top of it [CSCS middleware](https://gitlab.com/cscs-ci/ci-testing/containerised_ci_doc) defines several variables to configure slurm and container engine runners. On top of both our [CI/CD template file](ci/common.yml) defines the following templates to build, test and deploy images.
 
 ### .build-image
 Template for building images. Main variables:
@@ -137,7 +137,7 @@ run myapp cpu:
   script:
     - cd myapp/test
     # run myapp inside container on 16 MPI ranks with 8 threads/rank
-    - /path/to/myapp [optinal arguments]
+    - /path/to/myapp [optional arguments]
 ```
 
 ### .deploy-image-jfrog
