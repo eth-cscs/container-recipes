@@ -6,7 +6,14 @@ build cp2k-develop image:
   variables:
     CSCS_REBUILD_POLICY: always
     DOCKERFILE: CP2K/gcc-mkl-cpu/Dockerfile
-    NAME_TAG: 'cp2k-develop'
+
+deploy cp2k-develop image:
+  extends: .deploy-image-jfrog
+  needs: ["build cp2k-develop image"]
+  variables:
+    APP: 'cp2k'
+    ARCH: 'zen2'
+    VERSION_TAG: 'develop'
 
 
 #run sirius develop hohgant cpu:
