@@ -30,7 +30,7 @@ include:
 
 # template to run reframe tests
 .run-reframe-test:
-  stage: run
+  stage: test
   tags: ['hohgant-login-baremetal']
   variables:
     GIT_STRATEGY: fetch
@@ -38,29 +38,41 @@ include:
     - !reference [.fetch-registry-tokens, script]
     - echo -e "$CSCS_REGISTRY_USER\n$CSCS_REGISTRY_PASSWORD" | sarus pull --login $BASE_IMAGE
     - rm -rf cscs-reframe-tests
-    - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
+    - git clone -b alps https://github.com/eth-cscs/cscs-reframe-tests.git
     - python3 -m venv venv_reframe
     - source venv_reframe/bin/activate
     - pip install reframe-hpc
-    - export RFM_AUTODETECT_XTHOSTNAME=1
-    - export RFM_REMOTE_DETECT=0
-    - export CUDA_VISIBLE_DEVICES="0,1,2,3"
+    - export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
+    - export RFM_REMOTE_DETECT=1
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
     when: always
     paths:
       - report.xml
-      - stage/**/*.out
-      - stage/**/*.err
+      - $CI_PROJECT_DIR/stage/**/*.out
+      - $CI_PROJECT_DIR/stage/**/*.err
+      - $CI_PROJECT_DIR/output/**/*.out
+      - $CI_PROJECT_DIR/output/**/*.err
     reports:
       junit: report.xml
 
+.run-reframe-test-cpu:
+  extends: .run-reframe-test
+  variables:
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:cpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+
+.run-reframe-test-a100:
+  extends: .run-reframe-test
+  variables:
+    #CUDA_VISIBLE_DEVICES: "0,1,2,3"
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:nvgpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+
 # template to run tests on hohgant cpu partition
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-cpu:
+.run-hohgant-cpu:
   extends: .container-runner-hohgant-zen2
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -74,9 +86,9 @@ include:
 
 # template to run tests on hohgant nvidia gpu partition
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-a100:
+.run-hohgant-a100:
   extends: .container-runner-hohgant-a100
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -90,9 +102,9 @@ include:
 
 # template to run tests on hohgant maintenance node
 # BASE_IMAGE variable must be provided
-.run-test-hohgant-maint:
+.run-hohgant-maint:
   extends: .container-runner-hohgant
-  stage: run
+  stage: test
   variables:
     GIT_STRATEGY: fetch
     MPICH_MAX_THREAD_SAFETY: multiple
@@ -105,15 +117,16 @@ include:
     SLURM_JOB_NODELIST: nid002536
   image: $BASE_IMAGE
 
-.deploy-image-jfrog:
+.deploy-image:
   extends: .container-builder
   stage: deploy
   variables:
     DOCKERFILE: ci/deploy.Dockerfile
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION_TAG
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY/contbuild/apps/public/$ARCH/$APP:$VERSION
+    CSCS_REBUILD_POLICY: always
     DOCKER_BUILD_ARGS: '["BASE_IMAGE=$BASE_IMAGE"]'
 
 stages:
   - build
-  - run
+  - test
   - deploy

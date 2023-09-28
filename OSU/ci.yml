@@ -8,14 +8,14 @@ build osu mpich image:
     NAME_TAG: 'osu-6.2-mpich'
 
 .run-osu-collective-test-hohgant-cpu:
-  extends: .run-test-hohgant-cpu
+  extends: .run-hohgant-cpu
   variables:
     SLURM_JOB_NUM_NODES: 2
     SLURM_CPUS_PER_TASK: 1
     SLURM_NTASKS: 256
 
 .run-osu-p2p-test-hohgant-cpu:
-  extends: .run-test-hohgant-cpu
+  extends: .run-hohgant-cpu
   variables:
     SLURM_JOB_NUM_NODES: 2
     SLURM_CPUS_PER_TASK: 1
