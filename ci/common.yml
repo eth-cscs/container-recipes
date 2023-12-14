@@ -31,7 +31,7 @@ include:
 # template to run reframe tests
 .run-reframe-test:
   stage: test
-  tags: ['hohgant-login-baremetal']
+  tags: ['clariden-login-baremetal']
   variables:
     GIT_STRATEGY: fetch
   script:
@@ -60,18 +60,18 @@ include:
 .run-reframe-test-cpu:
   extends: .run-reframe-test
   variables:
-    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:cpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:cpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
 
 .run-reframe-test-a100:
   extends: .run-reframe-test
   variables:
     #CUDA_VISIBLE_DEVICES: "0,1,2,3"
-    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=hohgant:nvgpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:nvgpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
 
-# template to run tests on hohgant cpu partition
+# template to run tests on cpu zen2 architecture
 # BASE_IMAGE variable must be provided
-.run-hohgant-cpu:
-  extends: .container-runner-hohgant-zen2
+.run-zen2:
+  extends: .container-runner-clariden-zen2
   stage: test
   variables:
     GIT_STRATEGY: fetch
@@ -84,10 +84,10 @@ include:
     SLURM_TIMELIMIT: "30:00"
   image: $BASE_IMAGE
 
-# template to run tests on hohgant nvidia gpu partition
+# template to run tests on nvidia A100 gpu architecture
 # BASE_IMAGE variable must be provided
-.run-hohgant-a100:
-  extends: .container-runner-hohgant-a100
+.run-a100:
+  extends: .container-runner-clariden-a100
   stage: test
   variables:
     GIT_STRATEGY: fetch
@@ -98,23 +98,6 @@ include:
     SLURM_UNBUFFEREDIO: ''
     SLURM_WAIT: 0
     SLURM_TIMELIMIT: "30:00"
-  image: $BASE_IMAGE
-
-# template to run tests on hohgant maintenance node
-# BASE_IMAGE variable must be provided
-.run-hohgant-maint:
-  extends: .container-runner-hohgant
-  stage: test
-  variables:
-    GIT_STRATEGY: fetch
-    MPICH_MAX_THREAD_SAFETY: multiple
-    CSCS_REGISTRY_LOGIN: 'YES'
-    PULL_IMAGE: 'YES'
-    SLURM_HINT: nomultithread
-    SLURM_UNBUFFEREDIO: ''
-    SLURM_WAIT: 0
-    SLURM_TIMELIMIT: "30:00"
-    SLURM_JOB_NODELIST: nid002536
   image: $BASE_IMAGE
 
 .deploy-image:
