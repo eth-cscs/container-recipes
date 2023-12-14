@@ -8,7 +8,7 @@ import yaml
 DIR = os.getenv('dir')
 
 pipeline = {
-    "include" : [{"local" : f"{DIR}/ci.yaml"}]
+    "include" : [{"local" : f"{DIR}/ci.yml"}]
 }
 
 with open("pipeline.yml", "w") as f:
