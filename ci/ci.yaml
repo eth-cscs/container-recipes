@@ -1,0 +1,23 @@
+stages:
+  - configure
+  - run
+
+generate-pipeline:
+  stage: configure
+  tags: [clariden-login-baremetal]
+  script:
+    - python3 ./ci/generate_pipeline.py
+  artifacts:
+    paths:
+      - pipeline.yml
+
+run-pipeline:
+  stage: run
+  needs: [generate-pipeline]
+  variables:
+    CSCS_CI_MW_URL: $CSCS_CI_MW_URL
+  trigger:
+    include:
+      - artifact: pipeline.yml
+        job: generate-pipeline
+    strategy: depend
