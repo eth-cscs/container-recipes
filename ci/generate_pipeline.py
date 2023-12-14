@@ -11,7 +11,7 @@ pipeline = {
   "local" : [f"{DIR}/ci.yaml"]
 }
 
-with open("pipeline.yaml", "w") as f:
+with open("pipeline.yml", "w") as f:
     yaml.dump(pipeline, f)
 
 
