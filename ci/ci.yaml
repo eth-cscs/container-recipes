@@ -7,6 +7,8 @@ generate-pipeline:
   tags: [clariden-login-baremetal]
   script:
     - python3 ./ci/generate_pipeline.py
+    - ls
+    - pwd
     - cat pipeline.yml
   artifacts:
     paths:
