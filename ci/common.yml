@@ -44,7 +44,8 @@ include:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
     - export RFM_REMOTE_DETECT=1
-    - echo ${REFRAME_COMMAND}
+    - echo "$REFRAME_COMMAND"
+    - ls
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
