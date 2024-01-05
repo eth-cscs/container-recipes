@@ -1,5 +1,5 @@
-include:
-  - local: '/ci/common.yml'
+#include:
+#  - local: '/ci/common.yml'
 
 build sirius-develop cpu:
   extends: .build-image
@@ -43,7 +43,7 @@ test sirius-develop hohgant a100 reframe:
   needs: ["build sirius-develop a100"]
   variables:
     CUDA_VISIBLE_DEVICES: "0,1,2,3"
-    REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c SIRIUS/test/rfm_test.py --skip-performance-check'
+    REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/checks/apps/sirius/sirius_check.py --skip-performance-check'
 
 #run sirius develop hohgant cpu mpi-hook:
 #  extends: .run-hohgant-cpu
