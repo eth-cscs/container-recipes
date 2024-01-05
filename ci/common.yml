@@ -67,7 +67,7 @@ include:
   extends: .run-reframe-test
   variables:
     CUDA_VISIBLE_DEVICES: "0,1,2,3"
-    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:nvgpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:nvgpu -r --report-junit=report.xml ${REFRAME_ARGS}'
 
 # template to run tests on cpu zen2 architecture
 # BASE_IMAGE variable must be provided
