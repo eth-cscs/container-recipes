@@ -44,6 +44,7 @@ include:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
     - export RFM_REMOTE_DETECT=1
+    - echo "$REFRAME_COMMAND"
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
@@ -60,7 +61,7 @@ include:
 .run-reframe-test-cpu:
   extends: .run-reframe-test
   variables:
-    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:cpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
+    REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:cpu -r --report-junit=report.xml ${REFRAME_ARGS}'
 
 .run-reframe-test-a100:
   extends: .run-reframe-test
