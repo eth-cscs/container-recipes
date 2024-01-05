@@ -1,6 +1,3 @@
-#include:
-#  - local: '/ci/common.yml'
-
 build sirius-develop cpu:
   extends: .build-image
   variables:
@@ -14,7 +11,7 @@ build sirius-develop a100:
     DOCKERFILE: SIRIUS/cuda/Dockerfile
     DOCKER_BUILD_ARGS: '["CUDA_ARCH=80"]'
 
-test sirius-develop hohgant cpu:
+test sirius-develop cpu:
   extends: .run-zen2
   needs: ["build sirius-develop cpu"]
   variables:
@@ -26,7 +23,7 @@ test sirius-develop hohgant cpu:
     - cd SIRIUS/test/Si63Ge
     - sirius.scf --control.mpi_grid_dims=2:2 --control.std_evp_solver_name=scalapack --control.gen_evp_solver_name=scalapack --test_against=output_ref.json
 
-test sirius-develop hohgant a100:
+test sirius-develop a100:
   extends: .run-a100
   needs: ["build sirius-develop a100"]
   variables:
@@ -38,11 +35,11 @@ test sirius-develop hohgant a100:
     - cd SIRIUS/test/Si63Ge
     - sirius.scf --control.std_evp_solver_name=cusolver --control.gen_evp_solver_name=cusolver --test_against=output_ref.json
 
-test sirius-develop hohgant a100 reframe:
+test sirius-develop a100 reframe:
   extends: .run-reframe-test
   needs: ["build sirius-develop a100"]
   variables:
-    CUDA_VISIBLE_DEVICES: "0,1,2,3"
+    #CUDA_VISIBLE_DEVICES: "0,1,2,3"
     REFRAME_ARGS: '-S container_image="$BASE_IMAGE" -c cscs-reframe-tests/checks/apps/sirius/sirius_check.py --skip-performance-check'
 
 #run sirius develop hohgant cpu mpi-hook:

@@ -44,6 +44,7 @@ include:
     - pip install reframe-hpc
     - export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
     - export RFM_REMOTE_DETECT=1
+    - echo ${REFRAME_COMMAND}
     - ${REFRAME_COMMAND}
     - deactivate
   artifacts:
@@ -65,7 +66,7 @@ include:
 .run-reframe-test-a100:
   extends: .run-reframe-test
   variables:
-    #CUDA_VISIBLE_DEVICES: "0,1,2,3"
+    CUDA_VISIBLE_DEVICES: "0,1,2,3"
     REFRAME_COMMAND: 'reframe -C cscs-reframe-tests/config/cscs.py --system=clariden:nvgpu -r --report-junit=report.xml --tag sarus ${REFRAME_ARGS}'
 
 # template to run tests on cpu zen2 architecture
