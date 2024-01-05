@@ -36,7 +36,7 @@ test sirius-develop a100:
     - sirius.scf --control.std_evp_solver_name=cusolver --control.gen_evp_solver_name=cusolver --test_against=output_ref.json
 
 test sirius-develop a100 reframe:
-  extends: .run-reframe-test
+  extends: .run-reframe-test-a100
   needs: ["build sirius-develop a100"]
   variables:
     #CUDA_VISIBLE_DEVICES: "0,1,2,3"
